@@ -1,4 +1,24 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const prod = process.env.NODE_ENV === "production";
+const withPWA = require("next-pwa")({
+  dest: "public",
+  register: true,
+  disable: prod ? false : true,
+  skipWaiting: true,
+});
 
-module.exports = nextConfig
+module.exports = withPWA({
+  reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ibb.co",
+      },
+    ],
+  },
+});
