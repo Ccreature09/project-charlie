@@ -1,10 +1,11 @@
 "use client";
+import dynamic from "next/dynamic";
 import { db } from "@/firebase/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import React, { useState, ChangeEvent } from "react";
 import { Level } from "@/interfaces";
 import { Navbar } from "@/components/functional/navbar";
-import ReactQuill from "react-quill";
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 import "react-quill/dist/quill.snow.css";
 
