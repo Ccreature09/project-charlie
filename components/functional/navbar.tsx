@@ -33,13 +33,24 @@ import { cn } from "@/lib/utils";
 import { auth } from "@/firebase/firebase";
 import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
+import { Input } from "../ui/input";
+import { useRouter } from "next/navigation";
 
 const provider = new GoogleAuthProvider();
 const adminArray = ["qAYbbta2AgRfev9NTEbMUqL1r212"];
 
 export const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim() !== "") {
+      router.push(`/search/${encodeURIComponent(searchQuery)}`);
+    }
+  };
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -139,7 +150,7 @@ export const Navbar = () => {
                   Създай ниво!
                 </DropdownMenuItem>
               </Link>
-              <Link href="/levels">
+              <Link href="/level-packs">
                 <DropdownMenuItem className="cursor-pointer">
                   Нива
                 </DropdownMenuItem>
@@ -169,7 +180,7 @@ export const Navbar = () => {
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link href="/levels" legacyBehavior passHref>
+                <Link href="/level-packs" legacyBehavior passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Нива
                   </NavigationMenuLink>
@@ -177,6 +188,15 @@ export const Navbar = () => {
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
+
+          <form onSubmit={handleSearch} className="mt-4">
+            <Input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </form>
 
           <Popover>
             <PopoverTrigger className="flex items-center mx-8">
