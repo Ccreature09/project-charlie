@@ -86,33 +86,11 @@ export const Navbar = () => {
 
   return (
     <>
-      <div className="py-20 flex flex-col md:flex-row justify-between md:hidden bg-blue-500 items-center">
-        <div className="mx-auto flex flex-col md:flex-row">
-          <Link href={"/"}>
-            <Image
-              src="https://i.ibb.co/kX703qN/image-1.png"
-              alt="Logo"
-              width={200}
-              height={200}
-              priority
-              className="w-96 mx-auto mb-3 md:hidden  md:w-16 "
-            ></Image>
-          </Link>
-        </div>
-      </div>
-
-      <div className="w-full my-auto flex justify-between items-center bg-blue-500 h-24">
+      <div className="w-full my-auto flex justify-between items-center  bg-opacity-75 h-16 relative z-20 backdrop-blur-md">
         <div className="flex md:space-x-24 mx-auto">
           <div className="flex items-center">
             <Link href={"/"}>
-              <Image
-                src="https://i.ibb.co/kX703qN/image-1.png"
-                alt="Logo"
-                width={1000}
-                height={1000}
-                priority
-                className="w-44  my-auto hidden  md:flex mx-10 md:w-96 "
-              />
+              <div className="bg-gray-300 w-10 h-10 my-auto"></div>
             </Link>
           </div>
           <DropdownMenu>
@@ -163,7 +141,7 @@ export const Navbar = () => {
               <NavigationMenuItem>
                 <Link href="/docs" legacyBehavior passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Документация
+                    <p className="text-white">Документация</p>
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
@@ -175,14 +153,14 @@ export const Navbar = () => {
                   passHref
                 >
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Създай ниво!
+                    <p className="text-white">Създай ниво!</p>
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href="/level-packs" legacyBehavior passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Нива
+                    <p className="text-white">Нива</p>
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
@@ -272,7 +250,6 @@ export const Navbar = () => {
           </Popover>
         </div>
       </div>
-      <div className="bg-green-500 w-full h-8 flex flex-col"></div>
     </>
   );
 };
