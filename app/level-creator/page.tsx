@@ -6,7 +6,12 @@ import React, { useState, ChangeEvent } from "react";
 import { Level } from "@/interfaces";
 import { Navbar } from "@/components/functional/navbar";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
-
+const backgroundImageStyle = {
+  backgroundImage:
+    "url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')",
+  backgroundSize: "cover",
+  width: "100%",
+};
 import "react-quill/dist/quill.snow.css";
 
 const toolbarOptions = [
@@ -60,35 +65,37 @@ export default function Page() {
 
   return (
     <>
-      <Navbar />
-      <div className="flex bg-[#121212] text-white min-h-screen">
-        {/* Left Sidebar */}
-        <div className="bg-gray-800 w-1/4 p-6">
-          <h2 className="text-2xl font-semibold mb-4">Create New Level!</h2>
-          <div>
-            <p className="text-white text-lg mb-2">Name:</p>
-            <input
-              type="text"
-              value={newLevel.name}
-              onChange={(e) =>
-                setNewLevel({ ...newLevel, name: e.target.value })
-              }
-              className="bg-gray-700 p-2 rounded mb-4 w-full"
-            />
+      <div style={backgroundImageStyle} className="h-screen flex-row">
+        <Navbar />
+        <div className="flex bg-[#121212] text-white min-h-screen">
+          {/* Left Sidebar */}
+          <div className="bg-gray-800 w-1/4 p-6">
+            <h2 className="text-2xl font-semibold mb-4">Create New Level!</h2>
+            <div>
+              <p className="text-white text-lg mb-2">Name:</p>
+              <input
+                type="text"
+                value={newLevel.name}
+                onChange={(e) =>
+                  setNewLevel({ ...newLevel, name: e.target.value })
+                }
+                className="bg-gray-700 p-2 rounded mb-4 w-full"
+              />
+            </div>
+            <div>
+              <p className="text-white text-lg mb-2">Description:</p>
+              <ReactQuill
+                theme="snow" // You can choose different themes like 'bubble' or 'snow'
+                modules={{ toolbar: toolbarOptions }}
+                value={content}
+                onChange={setContent}
+              />
+            </div>
           </div>
-          <div>
-            <p className="text-white text-lg mb-2">Description:</p>
-            <ReactQuill
-              theme="snow" // You can choose different themes like 'bubble' or 'snow'
-              modules={{ toolbar: toolbarOptions }}
-              value={content}
-              onChange={setContent}
-            />
-          </div>
-        </div>
 
-        {/* Main Content */}
-        <div className="w-3/4 bg-[#121212] p-8">{/* Unity */}</div>
+          {/* Main Content */}
+          <div className="w-3/4 bg-[#121212] p-8">{/* Unity */}</div>
+        </div>
       </div>
     </>
   );
