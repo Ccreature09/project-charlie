@@ -11,7 +11,7 @@ export default function Home() {
 
   return (
     <>
-      <div style={backgroundImageStyle} className="h-screen flex-row">
+      <div style={backgroundImageStyle} className="h-full flex-row">
         <Navbar></Navbar>
         <div className="flex flex-row">
           <div className="mx-24 mt-96 ">
@@ -21,10 +21,11 @@ export default function Home() {
               <p className="font-semibold"> Start your journey!</p>
             </Button>
           </div>
-          <div className="">
+          <div className="flex">
             <img
               src="https://img.itch.zone/aW1nLzQ5NDI5NjkuZ2lm/original/z2%2Bcie.gif"
               alt=""
+              className="flex m-auto"
             />
           </div>
         </div>
