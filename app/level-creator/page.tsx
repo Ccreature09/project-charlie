@@ -1,7 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
 import { db } from "@/firebase/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import React, { useState, ChangeEvent } from "react";
 import { Level } from "@/interfaces";
 import { Navbar } from "@/components/functional/navbar";
@@ -31,6 +31,12 @@ const toolbarOptions = [
 export default function Page() {
   const initialLevelState: Level = {
     id: 0,
+    seed: "",
+    author: "",
+    authorUid: "",
+    tags: [],
+    imgURL: "",
+    publishDate: serverTimestamp(),
     grid: "",
     name: "",
     description: "",
@@ -65,7 +71,7 @@ export default function Page() {
 
   return (
     <>
-      <div style={backgroundImageStyle} className="h-screen flex-row">
+      <div style={backgroundImageStyle} className="h-full flex-row">
         <Navbar />
         <div className="flex bg-[#121212] text-white min-h-screen">
           {/* Left Sidebar */}
