@@ -136,7 +136,7 @@ export const Navbar = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <NavigationMenu className="hidden xl:flex mt-2">
+          <NavigationMenu className="hidden xl:flex my-auto">
             <NavigationMenuList className="gap-3">
               <NavigationMenuItem>
                 <Link href="/docs" legacyBehavior passHref>
@@ -167,7 +167,7 @@ export const Navbar = () => {
             </NavigationMenuList>
           </NavigationMenu>
 
-          <form onSubmit={handleSearch} className="mt-4">
+          <form onSubmit={handleSearch} className="my-auto">
             <Input
               type="text"
               placeholder="Search..."
