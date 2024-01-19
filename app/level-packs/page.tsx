@@ -40,7 +40,7 @@ const cardData = [
 export default function Page() {
   return (
     <>
-      <div style={backgroundImageStyle} className="h-screen flex-row">
+      <div style={backgroundImageStyle} className="h-full flex-row">
         <Navbar></Navbar>
 
         <div className="flex flex-wrap justify-center items-center gap-6 p-8">
