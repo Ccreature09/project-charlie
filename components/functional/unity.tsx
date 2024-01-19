@@ -6,13 +6,18 @@ import { Level } from "@/interfaces";
 
 export default function UnityEmbed({ level }: { level?: Level }) {
   const [loadingPercentage, setLoadingPercentage] = useState(0);
-  const { unityProvider, sendMessage, isLoaded, loadingProgression } =
-    useUnityContext({
-      loaderUrl: "/Build/unity.loader.js",
-      dataUrl: "/Build/unity.data",
-      frameworkUrl: "/Build/unity.framework.js",
-      codeUrl: "/Build/unity.wasm",
-    });
+  const {
+    unityProvider,
+    sendMessage,
+    isLoaded,
+    loadingProgression,
+    requestFullscreen,
+  } = useUnityContext({
+    loaderUrl: "/Build/unity.loader.js",
+    dataUrl: "/Build/unity.data",
+    frameworkUrl: "/Build/unity.framework.js",
+    codeUrl: "/Build/unity.wasm",
+  });
 
   useEffect(() => {
     setLoadingPercentage(Math.round(loadingProgression * 100));
@@ -40,8 +45,24 @@ export default function UnityEmbed({ level }: { level?: Level }) {
         </div>
       )}
 
-      <Unity unityProvider={unityProvider} className="w-full h-full " />
-      <Button onClick={SendData}>Click to Test</Button>
+      <Unity unityProvider={unityProvider} className="w-full h-full" />
+
+      <div className="absolute top-2 right-2">
+        <Button
+          onClick={() => {
+            requestFullscreen(true);
+          }}
+        >
+          Fullscreen
+        </Button>
+      </div>
+
+      <Button
+        onClick={() => sendMessage("Testing", "TestingMethod", "Test")}
+        className="absolute bottom-2 left-2"
+      >
+        Click to Test
+      </Button>
     </div>
   );
 }
