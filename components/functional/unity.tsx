@@ -38,31 +38,34 @@ export default function UnityEmbed({ level }: { level?: Level }) {
   }
 
   return (
-    <div className="aspect-[16/9] relative">
-      {isLoaded === false && (
-        <div className="absolute top-0 left-0 w-full h-full bg-gray-400 flex, justify-center items-center">
-          <p>Loading... ({loadingPercentage}%)</p>
+    <>
+      <div className="aspect-[16/9] relative">
+        {isLoaded === false && (
+          <div className="absolute top-0 left-0 w-full h-full bg-gray-400 flex, justify-center items-center">
+            <p>Loading... ({loadingPercentage}%)</p>
+          </div>
+        )}
+
+        <Unity unityProvider={unityProvider} className="w-full h-full" />
+      </div>
+      <div className="flex">
+        <div className="m-4">
+          <Button
+            onClick={() => {
+              requestFullscreen(true);
+            }}
+          >
+            Fullscreen
+          </Button>
         </div>
-      )}
 
-      <Unity unityProvider={unityProvider} className="w-full h-full" />
-
-      <div className="absolute top-2 right-2">
         <Button
-          onClick={() => {
-            requestFullscreen(true);
-          }}
+          className="m-4"
+          onClick={() => sendMessage("Testing", "TestingMethod", "Test")}
         >
-          Fullscreen
+          Click to Test
         </Button>
       </div>
-
-      <Button
-        onClick={() => sendMessage("Testing", "TestingMethod", "Test")}
-        className="absolute bottom-2 left-2"
-      >
-        Click to Test
-      </Button>
-    </div>
+    </>
   );
 }
