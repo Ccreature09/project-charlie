@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Level } from "@/interfaces";
 import { useRouter } from "next/navigation";
-import { collection, getDocs } from "firebase/firestore";
+import { Timestamp, collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
 import { Button } from "../ui/button";
 export default function LevelList() {
@@ -68,7 +68,7 @@ export default function LevelList() {
           <TableHead className="text-center text-white">Actions</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody className="text-white">
         {" "}
         {levels.map((level) => (
           <TableRow key={level.id}>
@@ -87,7 +87,13 @@ export default function LevelList() {
             <TableCell>{level.grid}</TableCell>
             <TableCell>{level.unlimited ? "true" : "false"}</TableCell>
             <TableCell>{level.author}</TableCell>
-            <TableCell>{level.publishDate.toString()}</TableCell>
+            <TableCell>
+              <TableCell>
+                {level.publishDate instanceof Timestamp
+                  ? level.publishDate.toDate().toLocaleDateString()
+                  : ""}
+              </TableCell>
+            </TableCell>
             <TableCell>
               {/* Actions column */}
               {/* Visit Level Button */}
