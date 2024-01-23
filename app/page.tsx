@@ -14,9 +14,11 @@ export default function Home() {
       <div style={backgroundImageStyle} className="h-screen flex-row">
         <Navbar></Navbar>
         <div className="flex flex-row">
-          <div className="mx-24 mt-96 ">
+          <div className="mx-24 mt-64 ">
             <p className="text-xl font-semibold text-white">Welcome to</p>
-            <p className="text-9xl font-black text-white">PRJ Charlie</p>
+            <p className="sm:text-6xl lg:text-9xl font-black text-white">
+              PRJ Charlie
+            </p>
             <Button className="mt-4 bg-opacity-10 bg-white hover:opacity-90">
               <p className="font-semibold"> Start your journey!</p>
             </Button>
