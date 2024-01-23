@@ -33,7 +33,7 @@ export default function Page() {
     id: 0,
     seed: "",
     author: "",
-    authorUid: "",
+    authorUID: "",
     tags: [],
     imgURL: "",
     publishDate: serverTimestamp(),
