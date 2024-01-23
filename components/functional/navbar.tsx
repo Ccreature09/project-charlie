@@ -28,6 +28,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
+import {
+  setDoc,
+  serverTimestamp,
+  doc,
+  query,
+  collection,
+  where,
+  getDocs,
+} from "firebase/firestore";
+import { db } from "@/firebase/firebase";
 
 import { cn } from "@/lib/utils";
 import { auth } from "@/firebase/firebase";
@@ -68,7 +78,36 @@ export const Navbar = () => {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
+      const user = result.user;
+
+      // Check if the user already exists in the "users" collection
+      const userDocRef = doc(db, "users", user.uid);
+      const querySnapshot = await query(
+        collection(db, "users"),
+        where("uid", "==", user.uid)
+      );
+      const queryData = await getDocs(querySnapshot);
+
+      if (queryData.empty) {
+        // User does not exist, create a new user document
+        const userData = {
+          uid: user.uid,
+          pfp: user.photoURL,
+          username: user.displayName || "", // You can adjust this as needed
+          dateOfRegistration: serverTimestamp(),
+          badges: [], // Initialize with an empty array
+          levels: [], // Initialize with an empty array
+        };
+
+        // Add the new user document to the "users" collection
+        await setDoc(userDocRef, userData);
+        console.log("New user created:", userData);
+      } else {
+        console.log("User already exists:");
+      }
+
+      // Set the user state
+      setUser(user);
     } catch (error) {
       console.error("Google sign-in failed:", error);
     }
@@ -226,7 +265,7 @@ export const Navbar = () => {
             <PopoverContent>
               {user && adminArray.includes(user.uid) && (
                 <Link href={"/admin"}>
-                  <Button className="w-full">Admin Dashboard</Button>
+                  <Button className="w-full">Администраторски Панел</Button>
                 </Link>
               )}
               {!user ? (
@@ -242,9 +281,15 @@ export const Navbar = () => {
                   <UserForm login={false} />
                 </>
               ) : (
-                <Button className="w-full mt-4" onClick={handleSignOut}>
-                  Изход
-                </Button>
+                <>
+                  <Link href={`/profile/${user.uid}`}>
+                    <Button className="w-full mt-4">Профил</Button>
+                  </Link>
+
+                  <Button className="w-full mt-4" onClick={handleSignOut}>
+                    Изход
+                  </Button>
+                </>
               )}
             </PopoverContent>
           </Popover>
