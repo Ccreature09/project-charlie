@@ -11,7 +11,7 @@ export default function Home() {
 
   return (
     <>
-      <div style={backgroundImageStyle} className="h-full flex-row">
+      <div style={backgroundImageStyle} className="h-screen flex-row">
         <Navbar></Navbar>
         <div className="flex flex-row">
           <div className="mx-24 mt-96 ">
