@@ -125,44 +125,46 @@ export default function Page({ params }: { params: { id: string } }) {
           {/* Add logic to display user's levels here */}
           <div className="gap-3">
             {levels.map((level) => (
-              <Link href={`/level/${level.id}`} key={level.id}>
-                <Card className="w-1/6 m-8">
-                  <CardHeader>
-                    <CardTitle className="text-5xl font-bold">
-                      {level.name}
-                    </CardTitle>
-                    <div className="gap-2 flex">
-                      <Badge className="bg-slate-400 mt-2 rounded-lg">
-                        <img
-                          src="https://i.ibb.co/VJhxNJV/Icon-1.png"
-                          className="w-3 mr-2"
-                          alt=""
-                        />
-                        10x10
-                      </Badge>
-                      <Badge className="bg-slate-400 mt-2 rounded-lg">
-                        <img
-                          src="https://i.ibb.co/KhG75bv/Rectangle-5.png"
-                          className="w-4 mr-2"
-                          alt=""
-                        />
-                        {level.difficulty}
-                      </Badge>
-                      <Badge className="bg-slate-400 mt-2 rounded-lg">
-                        {level.unlimited ? "Unlimited" : "Limited"}
-                      </Badge>
-                    </div>
-                    <img src="" alt="" />
-                    <CardDescription>{level.description}</CardDescription>
-                  </CardHeader>
+              <div key={level.id} className="w-1/6 m-8">
+                <Link href={`/level/${level.id}`}>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-5xl font-bold">
+                        {level.name}
+                      </CardTitle>
+                      <div className="gap-2 flex">
+                        <Badge className="bg-slate-400 mt-2 rounded-lg">
+                          <img
+                            src="https://i.ibb.co/VJhxNJV/Icon-1.png"
+                            className="w-3 mr-2"
+                            alt=""
+                          />
+                          10x10
+                        </Badge>
+                        <Badge className="bg-slate-400 mt-2 rounded-lg">
+                          <img
+                            src="https://i.ibb.co/KhG75bv/Rectangle-5.png"
+                            className="w-4 mr-2"
+                            alt=""
+                          />
+                          {level.difficulty}
+                        </Badge>
+                        <Badge className="bg-slate-400 mt-2 rounded-lg">
+                          {level.unlimited ? "Unlimited" : "Limited"}
+                        </Badge>
+                      </div>
+                      <img src="" alt="" />
+                      <CardDescription>{level.description}</CardDescription>
+                    </CardHeader>
 
-                  <CardFooter className="text-xl">
-                    {level.publishDate instanceof Timestamp
-                      ? level.publishDate.toDate().toLocaleDateString()
-                      : ""}
-                  </CardFooter>
-                </Card>
-              </Link>
+                    <CardFooter className="text-xl">
+                      {level.publishDate instanceof Timestamp
+                        ? level.publishDate.toDate().toLocaleDateString()
+                        : ""}
+                    </CardFooter>
+                  </Card>
+                </Link>
+              </div>
             ))}
           </div>
         </div>
