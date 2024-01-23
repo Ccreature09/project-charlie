@@ -7,10 +7,19 @@ export interface Level {
   grid: string;
   name: string;
   author: string;
-  authorUid: string;
+  authorUID: string;
   tags: string[];
   imgURL: string;
   description: string;
   difficulty: string;
   unlimited: boolean;
+}
+
+export interface User {
+  uid: string;
+  pfp: string;
+  username: string;
+  dateOfRegistration: Timestamp | FieldValue;
+  badges: string[];
+  levels: number[];
 }
