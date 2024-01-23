@@ -7,7 +7,7 @@ import { Navbar } from "@/components/functional/navbar";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-
+import { User } from "@/interfaces";
 const backgroundImageStyle = {
   backgroundImage:
     "url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')",
@@ -18,39 +18,57 @@ const backgroundImageStyle = {
 export default function Page({ params }: { params: { query: string } }) {
   const [slug, setSlug] = useState(params.query);
   const [levels, setLevels] = useState<Level[]>([]);
+  const [userProfiles, setUserProfiles] = useState<User[]>([]);
 
   useEffect(() => {
-    const fetchLevels = async () => {
+    const fetchResults = async () => {
       if (slug) {
         const searchQuery = decodeURIComponent(slug);
         console.log(slug);
         console.log(searchQuery);
 
-        const q = query(
+        // Query for level names
+        const levelQuery = query(
           collection(db, "levels"),
           where("name", ">=", searchQuery),
           where("name", "<=", searchQuery + "\uf8ff")
         );
 
+        // Query for user profiles
+        const userQuery = query(
+          collection(db, "users"),
+          where("username", ">=", searchQuery),
+          where("username", "<=", searchQuery + "\uf8ff")
+        );
+
         try {
-          const querySnapshot = await getDocs(q);
+          const levelQuerySnapshot = await getDocs(levelQuery);
           const matchingLevels: Level[] = [];
 
-          querySnapshot.forEach((levelDoc) => {
+          levelQuerySnapshot.forEach((levelDoc) => {
             const levelData = levelDoc.data() as Level;
             matchingLevels.push(levelData);
           });
 
           setLevels(matchingLevels);
+
+          const userQuerySnapshot = await getDocs(userQuery);
+          const matchingUserProfiles: User[] = [];
+
+          userQuerySnapshot.forEach((userDoc) => {
+            const userData = userDoc.data() as User;
+            matchingUserProfiles.push(userData);
+          });
+
+          setUserProfiles(matchingUserProfiles);
         } catch (error) {
-          console.error("Error fetching levels:", error);
+          console.error("Error fetching results:", error);
         }
       }
     };
 
-    fetchLevels();
+    fetchResults();
   }, [slug]);
-
   return (
     <>
       <div style={backgroundImageStyle} className="h-screen ">
@@ -62,6 +80,21 @@ export default function Page({ params }: { params: { query: string } }) {
           </p>
 
           <div className="m-10">
+            {userProfiles.map((user) => (
+              <Link href={`/profile/${user.uid}`} key={user.uid}>
+                <div className="bg-blue-100 flex rounded-lg p-5 my-5">
+                  <img
+                    src={user.pfp || "default_profile_image_url"}
+                    alt={user.username + " image"}
+                    className="w-48"
+                  />
+                  <div className="">
+                    <p className="text-4xl font-bold ml-4">{user.username}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+
             {levels.map((level) => (
               <div key={level.id}>
                 <Link
