@@ -50,7 +50,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -71,10 +70,12 @@ export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim() !== "") {
+      setLoading(true);
       router.push(`/search/${encodeURIComponent(searchQuery)}`);
     }
   };
@@ -143,8 +144,8 @@ export const Navbar = () => {
   return (
     <>
       <div className="w-full flex justify-between items-center bg-opacity-75 h-16 relative z-20 backdrop-blur-md">
-        <div className="flex mx-auto justify-between ">
-          <div className="flex">
+        <div className="flex w-full ">
+          <div className="flex justify-start ml-10">
             <div className="flex items-center">
               <Link href={"/"}>
                 <div className="bg-gray-300 w-10 h-10 my-auto"></div>
@@ -181,7 +182,16 @@ export const Navbar = () => {
                     <NavigationMenuLink
                       className={navigationMenuTriggerStyle()}
                     >
-                      <p className="text-white">Нива</p>
+                      <p className="text-white">Пакети</p>
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link href="/discover" legacyBehavior passHref>
+                    <NavigationMenuLink
+                      className={navigationMenuTriggerStyle()}
+                    >
+                      <p className="text-white">Открий нива</p>
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
@@ -189,7 +199,7 @@ export const Navbar = () => {
             </NavigationMenu>
           </div>
 
-          <div className="flex">
+          <div className="flex justify-end w-full mr-10">
             <div className="flex lg:hidden">
               <Drawer>
                 <DrawerTrigger className="mx-4">
@@ -222,21 +232,65 @@ export const Navbar = () => {
                         placeholder="Search for a level or user..."
                       />
                       <Button className="mx-5" onClick={handleSearch}>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          className="flex my-auto mx-5"
-                        >
-                          <circle cx="11" cy="11" r="8"></circle>
-                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
+                        {loading ? (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            className="spin-animation"
+                          >
+                            <line x1="12" y1="2" x2="12" y2="6"></line>
+                            <line x1="12" y1="18" x2="12" y2="22"></line>
+                            <line
+                              x1="4.93"
+                              y1="4.93"
+                              x2="7.76"
+                              y2="7.76"
+                            ></line>
+                            <line
+                              x1="16.24"
+                              y1="16.24"
+                              x2="19.07"
+                              y2="19.07"
+                            ></line>
+                            <line x1="2" y1="12" x2="6" y2="12"></line>
+                            <line x1="18" y1="12" x2="22" y2="12"></line>
+                            <line
+                              x1="4.93"
+                              y1="19.07"
+                              x2="7.76"
+                              y2="16.24"
+                            ></line>
+                            <line
+                              x1="16.24"
+                              y1="7.76"
+                              x2="19.07"
+                              y2="4.93"
+                            ></line>
+                          </svg>
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            className="flex my-auto mx-5"
+                          >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                          </svg>
+                        )}
                       </Button>
                     </DrawerTitle>
                   </DrawerHeader>
@@ -247,8 +301,8 @@ export const Navbar = () => {
             <div className="my-auto hidden lg:flex">
               <Dialog>
                 <DialogTrigger className="mx-4">
-                  <div className="flex bg-gray-100 bg-opacity-20 py-1 px-4 hover:bg-opacity-50 rounded-xl">
-                    <div className=" hover:bg-opacity-30 bg-gray-100 bg-opacity-0 transition-all duration-200 rounded-lg text-white ">
+                  <div className="flex bg-gray-100 bg-opacity-20 w-64 py-1 px-4 hover:bg-opacity-50 rounded-xl">
+                    <div>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="30"
@@ -265,7 +319,7 @@ export const Navbar = () => {
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                       </svg>
                     </div>
-                    <p className="text-white my-auto flex mx-5">Search..</p>
+                    <p className="text-white my-auto flex mx-5">Search...</p>
                   </div>
                 </DialogTrigger>
                 <DialogContent>
@@ -279,21 +333,65 @@ export const Navbar = () => {
                         placeholder="Search for a level or user..."
                       />
                       <Button className="mx-5" onClick={handleSearch}>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          className="flex my-auto mx-5"
-                        >
-                          <circle cx="11" cy="11" r="8"></circle>
-                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
+                        {loading ? (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            className="spin-animation"
+                          >
+                            <line x1="12" y1="2" x2="12" y2="6"></line>
+                            <line x1="12" y1="18" x2="12" y2="22"></line>
+                            <line
+                              x1="4.93"
+                              y1="4.93"
+                              x2="7.76"
+                              y2="7.76"
+                            ></line>
+                            <line
+                              x1="16.24"
+                              y1="16.24"
+                              x2="19.07"
+                              y2="19.07"
+                            ></line>
+                            <line x1="2" y1="12" x2="6" y2="12"></line>
+                            <line x1="18" y1="12" x2="22" y2="12"></line>
+                            <line
+                              x1="4.93"
+                              y1="19.07"
+                              x2="7.76"
+                              y2="16.24"
+                            ></line>
+                            <line
+                              x1="16.24"
+                              y1="7.76"
+                              x2="19.07"
+                              y2="4.93"
+                            ></line>
+                          </svg>
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            className="flex my-auto mx-5"
+                          >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                          </svg>
+                        )}
                       </Button>
                     </DialogTitle>
                   </DialogHeader>
@@ -406,7 +504,23 @@ export const Navbar = () => {
                 </svg>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>Навигация</DropdownMenuLabel>
+                <DropdownMenuLabel className="gap-4 flex">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                  </svg>
+                  <p className="my-auto flex">Навигация</p>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <Link href="/">
                   <DropdownMenuItem className="cursor-pointer">
@@ -425,17 +539,60 @@ export const Navbar = () => {
                 </Link>
                 <Link href="/level-packs">
                   <DropdownMenuItem className="cursor-pointer">
-                    Нива
+                    Пакети
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/discover">
+                  <DropdownMenuItem className="cursor-pointer">
+                    Отркий нива
                   </DropdownMenuItem>
                 </Link>
                 <DropdownMenuSeparator />
-
-                <DropdownMenuItem
-                  onClick={handleSignOut}
-                  className="cursor-pointer text-red-500"
-                >
-                  Изход
-                </DropdownMenuItem>
+                {!user ? (
+                  <DropdownMenuItem
+                    onClick={handleGoogleSignIn}
+                    className="cursor-pointer text-green-500 gap-4"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                      <polyline points="10 17 15 12 10 7"></polyline>
+                      <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    <p>Вход</p>
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
+                    className="cursor-pointer text-red-500 gap-4"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                      <polyline points="16 17 21 12 16 7"></polyline>
+                      <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <p>Изход</p>
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
