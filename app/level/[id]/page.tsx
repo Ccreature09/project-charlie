@@ -4,7 +4,7 @@ import { query, collection, where, getDocs } from "firebase/firestore";
 import React, { useState, useEffect } from "react";
 import { Level } from "@/interfaces";
 import { Navbar } from "@/components/functional/navbar";
-import UnityEmbed from "@/components/functional/unity";
+import UnityLevelEmbed from "@/components/functional/unity-level";
 
 const backgroundImageStyle = {
   backgroundImage:
@@ -63,7 +63,7 @@ export default function Page({ params }: { params: { id: string } }) {
           </div>
           {level && (
             <div className="w-3/4">
-              <UnityEmbed level={level}></UnityEmbed>
+              <UnityLevelEmbed level={level}></UnityLevelEmbed>
             </div>
           )}
         </div>
