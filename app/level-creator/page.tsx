@@ -7,7 +7,28 @@ import {
   serverTimestamp,
   getDocs,
   onSnapshot,
+  doc,
+  query,
+  where,
+  setDoc,
 } from "firebase/firestore";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import React, { useEffect, useState } from "react";
 import { Level } from "@/interfaces";
 import { Navbar } from "@/components/functional/navbar";
@@ -18,7 +39,7 @@ const backgroundImageStyle = {
   backgroundSize: "cover",
   width: "100%",
 };
-import { User } from "firebase/auth";
+import { User, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 import "react-quill/dist/quill.snow.css";
 import { Button } from "@/components/ui/button";
@@ -31,7 +52,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { onAuthStateChanged } from "firebase/auth";
-
+import UserForm from "@/components/functional/signIn";
+import { Separator } from "@/components/ui/separator";
+const provider = new GoogleAuthProvider();
 const toolbarOptions = [
   ["bold", "italic", "underline"], // toggled buttons
   ["blockquote", "code-block"],
@@ -65,10 +88,58 @@ export default function Page() {
   };
 
   const [newLevel, setNewLevel] = useState(initialLevelState);
+  const [width, setWidth] = useState(0);
+  const [height, setHeight] = useState(0);
+
   const [levelCount, setLevelCount] = useState(0);
-  const [user, setUser] = useState<User | null>();
+  const [user, setUser] = useState<User | null>(null);
   const [description, setDescription] = useState("");
   const levelsCollectionRef = collection(db, "levels");
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [signInPopup, setsignInPopup] = useState(false);
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Check if the user already exists in the "users" collection
+      const userDocRef = doc(db, "users", user.uid);
+      const querySnapshot = await query(
+        collection(db, "users"),
+        where("uid", "==", user.uid)
+      );
+      const queryData = await getDocs(querySnapshot);
+
+      if (queryData.empty) {
+        // User does not exist, create a new user document
+        const userData = {
+          uid: user.uid,
+          pfp: user.photoURL,
+          username: user.displayName || "", // You can adjust this as needed
+          dateOfRegistration: serverTimestamp(),
+          badges: [], // Initialize with an empty array
+          levels: [], // Initialize with an empty array
+        };
+
+        // Add the new user document to the "users" collection
+        await setDoc(userDocRef, userData);
+        console.log("New user created:", userData);
+      } else {
+        console.log("User already exists:");
+      }
+
+      // Set the user state
+      setUser(user);
+    } catch (error) {
+      console.error("Google sign-in failed:", error);
+    }
+  };
+  const handleLogin = () => {
+    // You can implement your own authentication flow here.
+    // Redirect the user to the login page or use Firebase authentication methods.
+    // For simplicity, I'm just toggling the dialog state.
+    setIsLoginDialogOpen(!isLoginDialogOpen);
+  };
 
   const fetchLevelCount = async () => {
     const snapshot = await getDocs(levelsCollectionRef);
@@ -94,8 +165,10 @@ export default function Page() {
 
   const handleSubmit = async () => {
     try {
-      const docRef = await addDoc(levelsCollectionRef, {
+      // Add the new level document to the "levels" collection
+      await addDoc(levelsCollectionRef, {
         ...newLevel,
+        grid: `${width}x${height}`,
         id: levelCount,
         description: description,
         author: user?.displayName,
@@ -104,11 +177,29 @@ export default function Page() {
         publishDate: serverTimestamp(),
       });
 
-      console.log("Document written with ID: ", docRef.id);
+      // Query the users collection for the level's author UID
+      const userQuery = query(
+        collection(db, "users"),
+        where("uid", "==", user?.uid)
+      );
+
+      const userQuerySnapshot = await getDocs(userQuery);
+
+      if (!userQuerySnapshot.empty) {
+        const userDoc = userQuerySnapshot.docs[0];
+
+        // Update the levels array in the user document
+        const userData = userDoc.data();
+        const updatedLevels = [...userData.levels, levelCount];
+
+        await setDoc(userDoc.ref, { levels: updatedLevels }, { merge: true });
+      }
     } catch (error) {
       console.error("Error creating level:", error);
     } finally {
       setDescription("");
+      setWidth(0);
+      setHeight(0);
       setNewLevel(initialLevelState);
     }
   };
@@ -117,8 +208,10 @@ export default function Page() {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
+        setsignInPopup(false);
       } else {
         setUser(null);
+        setsignInPopup(true);
       }
     });
   }, []);
@@ -127,8 +220,40 @@ export default function Page() {
     <>
       <div style={backgroundImageStyle} className="h-full flex-row">
         <Navbar />
-        <div className="flex bg-[#121212] min-h-screen">
-          {/* Left Sidebar */}
+
+        <div className="flex bg-[#121212] relative min-h-screen">
+          <AlertDialog open={signInPopup}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Регистрирайте се за да създавате нива!
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your account and remove your data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <Popover>
+                  <PopoverTrigger>
+                    <Button>Continue</Button>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <Button
+                      className="w-full mb-5"
+                      onClick={handleGoogleSignIn}
+                    >
+                      Вход с Google
+                    </Button>
+                    <UserForm login />
+                    <Separator className="mb-5" />
+                    <UserForm login={false} />
+                  </PopoverContent>
+                </Popover>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
           <div className="bg-gray-800 w-1/4 p-6">
             <h2 className="text-2xl text-white font-semibold mb-4">
               Create New Level!
@@ -155,33 +280,75 @@ export default function Page() {
               />
               <div className="mt-10">
                 <p className="text-white">Grid size (width x height):</p>
-                <Input
-                  placeholder="5x5"
-                  value={newLevel.grid}
-                  onChange={(e) =>
-                    setNewLevel({ ...newLevel, grid: e.target.value })
-                  }
-                  className="text-black"
-                ></Input>
-                <p className="text-white mt-5">Difficulty:</p>
+                <div className="flex gap-3">
+                  <div className="w-1/2">
+                    <p className="text-white mt-5">Width:</p>
+                    <Input
+                      type="number"
+                      placeholder="5"
+                      value={width}
+                      onChange={(e) => setWidth(Number(e.target.value))}
+                      className="text-black"
+                    ></Input>
+                  </div>
+                  <div className="1/2">
+                    <p className="text-white mt-5">Height:</p>
+                    <Input
+                      type="number"
+                      placeholder="5"
+                      value={height}
+                      onChange={(e) => setHeight(Number(e.target.value))}
+                      className="text-black"
+                    ></Input>
+                  </div>
+                </div>
+                <p className="text-white mt-3">
+                  Grid Size: {width} x {height}
+                </p>
+                <div className="flex gap-3">
+                  <div className="w-1/2">
+                    <p className="text-white mt-5">Difficulty:</p>
+                    <Select
+                      onValueChange={(e) =>
+                        setNewLevel({ ...newLevel, difficulty: e })
+                      }
+                      value={newLevel.difficulty}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Difficulty" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="easy">Easy</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="hard">Hard</SelectItem>
+                        <SelectItem value="insane">Insane</SelectItem>
+                        <SelectItem value="master">Master</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="w-1/2">
+                    <p className="text-white mt-5">Blocks:</p>
 
-                <Select
-                  onValueChange={(e) =>
-                    setNewLevel({ ...newLevel, difficulty: e })
-                  }
-                  value={newLevel.difficulty}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Difficulty" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="easy">Easy</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="hard">Hard</SelectItem>
-                    <SelectItem value="insane">Insane</SelectItem>
-                    <SelectItem value="master">Master</SelectItem>
-                  </SelectContent>
-                </Select>
+                    <Select
+                      onValueChange={(e) =>
+                        setNewLevel({
+                          ...newLevel,
+                          unlimited: e == "unlimited" ? true : false,
+                        })
+                      }
+                      value={newLevel.unlimited ? "unlimited" : "limited"}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Blocks" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="unlimited">Unlimited</SelectItem>
+                        <SelectItem value="limited">Limited</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
                 <Button onClick={handleSubmit} className="flex w-full mt-10">
                   Submit
                 </Button>
