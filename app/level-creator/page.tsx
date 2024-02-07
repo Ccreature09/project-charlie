@@ -14,16 +14,12 @@ import {
 } from "firebase/firestore";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
 import {
   Popover,
   PopoverContent,
@@ -54,6 +50,7 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import UserForm from "@/components/functional/signIn";
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 const provider = new GoogleAuthProvider();
 const toolbarOptions = [
   ["bold", "italic", "underline"], // toggled buttons
@@ -234,6 +231,9 @@ export default function Page() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
+                <Link href={"/"}>
+                  <Button>Back</Button>
+                </Link>
                 <Popover>
                   <PopoverTrigger>
                     <Button>Continue</Button>
