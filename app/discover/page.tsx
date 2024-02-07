@@ -12,14 +12,14 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Level } from "@/interfaces";
 import { db } from "@/firebase/firebase";
-
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 const backgroundImageStyle = {
   backgroundImage:
     "url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')",
@@ -32,7 +32,6 @@ export default function Page() {
   const [likedLevels, setLikedLevels] = useState<Level[]>([]);
 
   useEffect(() => {
-    // Fetch new levels from Firestore
     const fetchNewLevels = async () => {
       try {
         const q = query(
@@ -54,7 +53,6 @@ export default function Page() {
       }
     };
 
-    // Fetch liked levels from Firestore
     const fetchLikedLevels = async () => {
       try {
         const q = query(
@@ -78,7 +76,7 @@ export default function Page() {
 
     fetchNewLevels();
     fetchLikedLevels();
-  }, []); // Run once on component mount
+  }, []);
 
   return (
     <>
@@ -102,13 +100,32 @@ export default function Page() {
                     <Card>
                       <CardHeader>
                         <CardTitle>{level.name}</CardTitle>
-                        <CardDescription>{level.description}</CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <p>Card Content</p>
+                        <img src={level.imgURL} alt="" />
                       </CardContent>
                       <CardFooter>
-                        <p>Card Footer</p>
+                        <Link href={`/level/${level.id}`}>
+                          <Button>Play</Button>
+                        </Link>
+                        <div className="flex mx-4 gap-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            className="my-auto"
+                          >
+                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                          </svg>
+
+                          <p className="text-xl">{level.likes}</p>
+                        </div>
                       </CardFooter>
                     </Card>
                   </CarouselItem>
@@ -122,7 +139,7 @@ export default function Page() {
           {/* Second Carousel */}
           <div className="my-10 ">
             <p className="ml-24 my-5 text-white text-3xl font-semibold">
-              Най харесвани нива
+              Най-харесвани нива
             </p>
             <Carousel className="mx-20">
               <CarouselContent>
@@ -131,13 +148,32 @@ export default function Page() {
                     <Card>
                       <CardHeader>
                         <CardTitle>{level.name}</CardTitle>
-                        <CardDescription>{level.description}</CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <p>Card Content</p>
+                        <img src={level.imgURL} alt="" />
                       </CardContent>
                       <CardFooter>
-                        <p>Card Footer</p>
+                        <Link href={`/level/${level.id}`}>
+                          <Button>Play</Button>
+                        </Link>
+                        <div className="flex mx-4 gap-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            className="my-auto"
+                          >
+                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                          </svg>
+
+                          <p className="text-xl">{level.likes}</p>
+                        </div>
                       </CardFooter>
                     </Card>
                   </CarouselItem>
