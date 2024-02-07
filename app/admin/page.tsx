@@ -7,7 +7,7 @@ import React, { useState, useEffect } from "react";
 import { User } from "firebase/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LevelList from "@/components/functional/level-list";
-
+import UserList from "@/components/functional/user-list";
 const backgroundImageStyle = {
   backgroundImage:
     "url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')",
@@ -47,12 +47,18 @@ export default function Page() {
             <div className="w-full flex flex-row">
               <div className="flex flex-row w-full">
                 <TabsContent value="levels">
-                  <div className="flex flex-row">
+                  <div className="flex ">
                     <LevelList></LevelList>
                   </div>
                 </TabsContent>
                 <TabsContent value="level-packs"></TabsContent>
-                <TabsContent value="users"></TabsContent>
+                <TabsContent value="users">
+                  <div className="flex ">
+                    <div className="flex mx-auto">
+                      <UserList></UserList>
+                    </div>
+                  </div>
+                </TabsContent>
               </div>
             </div>
           </Tabs>
