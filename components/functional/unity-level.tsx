@@ -1,34 +1,55 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import { Button } from "../ui/button";
 import { Level } from "@/interfaces";
 import { Progress } from "../ui/progress";
-export default function UnityLevelEmbed({ level }: { level?: Level }) {
+
+export default function UnityLevelEmbed({
+  level,
+  onGameStatusChange,
+  onFullscreen,
+}: {
+  level?: Level;
+  onGameStatusChange: (status: string) => void;
+  onFullscreen: boolean;
+}) {
   const [loadingPercentage, setLoadingPercentage] = useState(0);
+  const [gameStatus, setGameStatus] = useState("");
   const {
     unityProvider,
     sendMessage,
     isLoaded,
     loadingProgression,
     requestFullscreen,
+    addEventListener,
+    removeEventListener,
   } = useUnityContext({
     loaderUrl: "/build/level/unity.loader.js",
     dataUrl: "/build/level/unity.data",
     frameworkUrl: "/build/level/unity.framework.js",
     codeUrl: "/build/level/unity.wasm",
   });
-
+  useEffect(() => {
+    requestFullscreen(true);
+  }, [onFullscreen]);
   useEffect(() => {
     setLoadingPercentage(Math.round(loadingProgression * 100));
 
-    if (isLoaded) {
-      const timeoutId = setTimeout(() => {
-        SendData();
-      }, 2500);
-
-      return () => clearTimeout(timeoutId);
-    }
+    isLoaded && SendData();
   }, [isLoaded, loadingProgression]);
+
+  const FetchData = useCallback((data: any) => {
+    setGameStatus(data);
+    onGameStatusChange(data);
+    console.log(data);
+  }, []);
+
+  useEffect(() => {
+    addEventListener("SendData", FetchData);
+    return () => {
+      removeEventListener("SendData", FetchData);
+    };
+  }, [addEventListener, removeEventListener, FetchData]);
 
   function SendData() {
     const combinedData = `//LEVEL_NAME:${level?.name}//,AUTHOR_NAME:${level?.author}//SEED:,${level?.seed}//`;
@@ -37,38 +58,23 @@ export default function UnityLevelEmbed({ level }: { level?: Level }) {
   }
 
   return (
-    <>
-      <div className="aspect-[16/9] relative">
-        {isLoaded === false && (
-          <div className="absolute top-0 left-0 w-full h-full bg-gray-400 flex, justify-center items-center">
-            <p className="text-6xl font-black text-center my-32">Loading...</p>
-            <Progress
-              className="w-1/2 flex mx-auto"
-              value={loadingPercentage}
-            ></Progress>
-          </div>
-        )}
-
-        <Unity unityProvider={unityProvider} className="w-full h-full" />
-      </div>
-      <div className="flex">
-        <div className="m-4">
-          <Button
-            onClick={() => {
-              requestFullscreen(true);
-            }}
-          >
-            Fullscreen
-          </Button>
-        </div>
-
-        <Button
-          className="m-4"
-          onClick={() => sendMessage("Testing", "TestingMethod", "Test")}
-        >
-          Click to Test
-        </Button>
-      </div>
-    </>
+    <div className="aspect-[16/9] relative">
+      {level && (
+        <>
+          {isLoaded === false && (
+            <div className="absolute top-0 left-0 w-full h-full bg-gray-400 flex, justify-center items-center">
+              <p className="text-6xl font-black text-center my-32">
+                Loading...
+              </p>
+              <Progress
+                className="w-1/2 flex mx-auto"
+                value={loadingPercentage}
+              ></Progress>
+            </div>
+          )}
+          <Unity unityProvider={unityProvider} className="w-full h-full" />
+        </>
+      )}
+    </div>
   );
 }
