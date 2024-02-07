@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   NavigationMenu,
@@ -145,13 +144,16 @@ export const Navbar = () => {
     <>
       <div className="w-full flex justify-between items-center bg-opacity-75 h-16 relative z-20 backdrop-blur-md">
         <div className="flex w-full ">
-          <div className="flex justify-start ml-10">
-            <div className="flex items-center">
-              <Link href={"/"}>
-                <div className="bg-gray-300 w-10 h-10 my-auto"></div>
-              </Link>
-            </div>
-
+          <div className="flex my-auto ml-5">
+            <Link href={"/"}>
+              <img
+                src="https://i.ibb.co/RCkLHNs/Logo-1-ai-brush-removebg-qztjehsw.png"
+                alt=""
+                className="w-24"
+              />
+            </Link>
+          </div>
+          <div className="flex justify-start ml-5">
             <NavigationMenu className="hidden mx-4 md:flex my-auto">
               <NavigationMenuList className="gap-3">
                 <NavigationMenuItem>
@@ -211,9 +213,9 @@ export const Navbar = () => {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="text-white flex my-auto"
                     >
                       <circle cx="11" cy="11" r="8"></circle>
@@ -240,9 +242,9 @@ export const Navbar = () => {
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             className="spin-animation"
                           >
                             <line x1="12" y1="2" x2="12" y2="6"></line>
@@ -282,9 +284,9 @@ export const Navbar = () => {
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             className="flex my-auto mx-5"
                           >
                             <circle cx="11" cy="11" r="8"></circle>
@@ -310,9 +312,9 @@ export const Navbar = () => {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                         className="text-white flex my-auto"
                       >
                         <circle cx="11" cy="11" r="8"></circle>
@@ -341,9 +343,9 @@ export const Navbar = () => {
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             className="spin-animation"
                           >
                             <line x1="12" y1="2" x2="12" y2="6"></line>
@@ -383,9 +385,9 @@ export const Navbar = () => {
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             className="flex my-auto mx-5"
                           >
                             <circle cx="11" cy="11" r="8"></circle>
@@ -411,9 +413,9 @@ export const Navbar = () => {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       >
                         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
                         <polyline points="10 17 15 12 10 7"></polyline>
@@ -493,9 +495,9 @@ export const Navbar = () => {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   className="text-white"
                 >
                   <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -512,9 +514,9 @@ export const Navbar = () => {
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   >
                     <circle cx="12" cy="12" r="10"></circle>
                     <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
@@ -560,9 +562,9 @@ export const Navbar = () => {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     >
                       <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
                       <polyline points="10 17 15 12 10 7"></polyline>
@@ -582,9 +584,9 @@ export const Navbar = () => {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     >
                       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                       <polyline points="16 17 21 12 16 7"></polyline>
