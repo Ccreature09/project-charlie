@@ -8,6 +8,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Level } from "@/interfaces";
 import { useRouter } from "next/navigation";
 import { Timestamp, collection, getDocs } from "firebase/firestore";
@@ -16,6 +25,9 @@ import { Button } from "../ui/button";
 export default function LevelList() {
   const router = useRouter();
   const [levels, setLevels] = useState<Level[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [mount, setMount] = useState(false);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     const fetchLevels = async () => {
@@ -32,7 +44,7 @@ export default function LevelList() {
         console.error("Error fetching levels:", error);
       }
     };
-
+    setMount(true);
     fetchLevels();
   }, []); // Empty dependency array ensures the effect runs once when the component mounts
 
@@ -51,67 +63,141 @@ export default function LevelList() {
     // You may want to trigger an API call or state update to delete the level
   };
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentLevels = levels.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
-    <Table className="w-full">
-      <TableCaption>A list of your levels.</TableCaption>
-      <TableHeader className="w-full">
-        <TableRow className="w-full mx-auto">
-          <TableHead className="text-center text-white">Level ID</TableHead>
-          <TableHead className="text-center text-white">Image</TableHead>
-          <TableHead className="text-center text-white">Name</TableHead>
-          <TableHead className="text-center text-white">Tags</TableHead>
-          <TableHead className="text-center text-white">Difficulty</TableHead>
-          <TableHead className="text-center text-white">Grid Size</TableHead>
-          <TableHead className="text-center text-white">Unlimited</TableHead>
-          <TableHead className="text-center text-white">Author</TableHead>
-          <TableHead className="text-center text-white">Publish Date</TableHead>
-          <TableHead className="text-center text-white">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody className="text-white">
-        {" "}
-        {levels.map((level) => (
-          <TableRow key={level.id}>
-            <TableCell>{level.id}</TableCell>
-            {/* Image column */}
-            <TableCell>
-              <img
-                src={`https://example.com/${level.imgURL}`}
-                alt="Level Image"
-                className="w-8 h-8"
-              />
-            </TableCell>
-            <TableCell>{level.name}</TableCell>
-            <TableCell>{level.tags.join(", ")}</TableCell>
-            <TableCell>{level.difficulty}</TableCell>
-            <TableCell>{level.grid}</TableCell>
-            <TableCell>{level.unlimited ? "true" : "false"}</TableCell>
-            <TableCell>{level.author}</TableCell>
-            <TableCell>
-              <TableCell>
-                {level.publishDate instanceof Timestamp
-                  ? level.publishDate.toDate().toLocaleDateString()
-                  : ""}
-              </TableCell>
-            </TableCell>
-            <TableCell>
-              {/* Actions column */}
-              {/* Visit Level Button */}
-              <Button onClick={() => handleVisitLevel(level.id)}>
-                Visit Level
-              </Button>
-              {/* Warn Level Button */}
-              <Button onClick={() => handleWarnLevel(level.id)}>
-                Warn User
-              </Button>
-              {/* Delete Level Button */}
-              <Button onClick={() => handleDeleteLevel(level.id)}>
-                Delete Level
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <>
+      {mount && (
+        <div className="flex flex-col ">
+          <Table className="w-full">
+            <TableHeader className="w-full">
+              <TableRow className="w-full mx-auto">
+                <TableHead className="text-center text-white">
+                  Level ID
+                </TableHead>
+                <TableHead className="text-center text-white">Image</TableHead>
+                <TableHead className="text-center text-white">Name</TableHead>
+                <TableHead className="text-center text-white">Tags</TableHead>
+                <TableHead className="text-center text-white">
+                  Difficulty
+                </TableHead>
+                <TableHead className="text-center text-white">
+                  Grid Size
+                </TableHead>
+                <TableHead className="text-center text-white">
+                  Unlimited
+                </TableHead>
+                <TableHead className="text-center text-white">Author</TableHead>
+                <TableHead className="text-center text-white">
+                  Publish Date
+                </TableHead>
+                <TableHead className="text-center text-white">
+                  Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="text-white">
+              {" "}
+              {currentLevels.map((level) => (
+                <TableRow key={level.id}>
+                  <TableCell>{level.id}</TableCell>
+                  {/* Image column */}
+                  <TableCell>
+                    <img
+                      src={`https://example.com/${level.imgURL}`}
+                      alt="Level Image"
+                      className="w-8 h-8"
+                    />
+                  </TableCell>
+                  <TableCell>{level.name}</TableCell>
+                  <TableCell>{level.tags.join(", ")}</TableCell>
+                  <TableCell>{level.difficulty}</TableCell>
+                  <TableCell>{level.grid}</TableCell>
+                  <TableCell>{level.unlimited ? "true" : "false"}</TableCell>
+                  <TableCell>{level.author}</TableCell>
+                  <TableCell>
+                    <TableCell>
+                      {level.publishDate instanceof Timestamp
+                        ? level.publishDate.toDate().toLocaleDateString()
+                        : ""}
+                    </TableCell>
+                  </TableCell>
+                  <TableCell>
+                    {/* Actions column */}
+                    {/* Visit Level Button */}
+                    <Button onClick={() => handleVisitLevel(level.id)}>
+                      Visit Level
+                    </Button>
+                    {/* Warn Level Button */}
+                    <Button onClick={() => handleWarnLevel(level.id)}>
+                      Warn User
+                    </Button>
+                    {/* Delete Level Button */}
+                    <Button onClick={() => handleDeleteLevel(level.id)}>
+                      Delete Level
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() =>
+                    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
+                  }
+                  //   disabled={currentPage === 1}
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  onClick={() => setCurrentPage(1)}
+                  isActive={currentPage === 1}
+                >
+                  1
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  onClick={() => setCurrentPage(2)}
+                  isActive={currentPage === 2}
+                >
+                  2
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  onClick={() => setCurrentPage(3)}
+                  isActive={currentPage === 3}
+                >
+                  3
+                </PaginationLink>
+              </PaginationItem>
+              {/* ... other pages ... */}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() =>
+                    setCurrentPage((prevPage) =>
+                      Math.min(
+                        prevPage + 1,
+                        Math.ceil(levels.length / itemsPerPage)
+                      )
+                    )
+                  }
+                  //   disabled={
+                  //    currentLevels.length < itemsPerPage ||
+                  //    currentPage === Math.ceil(levels.length / itemsPerPage)
+                  //  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
+    </>
   );
 }
