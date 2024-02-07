@@ -20,7 +20,7 @@ export default function Home() {
 
   return (
     <>
-      <div style={backgroundImageStyle} className="h-screen flex-row">
+      <div style={backgroundImageStyle} className="h-screen  flex-row">
         <Navbar></Navbar>
         <div className="md:flex flex-row">
           {/* Image on smaller screens */}
@@ -58,75 +58,71 @@ export default function Home() {
         </div>
       </div>
       <div className="w-full h-16 bg-slate-900"></div>
-      <div style={backgroundImageStyle} className="h-screen flex-row">
+      <div className="h-screen bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] bg-cover flex-row">
         <p className="text-white text-center text-5xl font-bold p-16">
           Какво преставлява PROJECT: Charlie?
         </p>
 
-        <div className="flex flex-col container gap-5">
-          <div className="flex gap-5">
-            <Card className="w-1/2">
-              <CardHeader>
-                <CardTitle>Level Creator</CardTitle>
-                <CardDescription>
-                  Създай всякакви нива с нашия Level Creator!
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>Card Content</p>
-              </CardContent>
-              <CardFooter>
-                <p>Card Footer</p>
-              </CardFooter>
-            </Card>
-            <Card className="w-1/2">
-              <CardHeader>
-                <CardTitle>Level Packs</CardTitle>
-                <CardDescription>
-                  Стани виртуоз в програмирането като решиш нашите подбрани
-                  обучителни нива!
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>Card Content</p>
-              </CardContent>
-              <CardFooter>
-                <p>Card Footer</p>
-              </CardFooter>
-            </Card>
-          </div>
-          <div className="flex gap-5">
-            <Card className="w-1/2">
-              <CardHeader>
-                <CardTitle>Съзтезания</CardTitle>
-                <CardDescription>
-                  Съзтезавай се с други програмисти, за откриването на най
-                  ефикасното и бързо решение за нивото!
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>Card Content</p>
-              </CardContent>
-              <CardFooter>
-                <p>Card Footer</p>
-              </CardFooter>
-            </Card>
-            <Card className="w-1/2">
-              <CardHeader>
-                <CardTitle>Значки</CardTitle>
-                <CardDescription>
-                  Кой не обича значки! Събери всички значки за твоя профил, като
-                  изпълняваш мисии!
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>Card Content</p>
-              </CardContent>
-              <CardFooter>
-                <p>Card Footer</p>
-              </CardFooter>
-            </Card>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 container gap-5">
+          <Card>
+            <CardHeader>
+              <CardTitle>Level Creator</CardTitle>
+              <CardDescription>
+                Създай всякакви нива с нашия Level Creator!
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Card Content</p>
+            </CardContent>
+            <CardFooter>
+              <p>Card Footer</p>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Level Packs</CardTitle>
+              <CardDescription>
+                Стани виртуоз в програмирането като решиш нашите подбрани
+                обучителни нива!
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Card Content</p>
+            </CardContent>
+            <CardFooter>
+              <p>Card Footer</p>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Съзтезания</CardTitle>
+              <CardDescription>
+                Съзтезавай се с други програмисти, за откриването на най
+                ефикасното и бързо решение за нивото!
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Card Content</p>
+            </CardContent>
+            <CardFooter>
+              <p>Card Footer</p>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Значки</CardTitle>
+              <CardDescription>
+                Кой не обича значки! Събери всички значки за твоя профил, като
+                изпълняваш мисии!
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Card Content</p>
+            </CardContent>
+            <CardFooter>
+              <p>Card Footer</p>
+            </CardFooter>
+          </Card>
         </div>
       </div>
     </>
