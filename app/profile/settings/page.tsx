@@ -57,7 +57,7 @@ export default function Page() {
                 <h2 className="text-3xl font-bold mb-4">Account Settings</h2>
                 <div className="flex">
                   <Avatar className="mx-5">
-                    <AvatarImage src={user?.photoURL} />
+                    <AvatarImage src={user?.photoURL ?? "missing"} />
                     <AvatarFallback>PFP</AvatarFallback>
                   </Avatar>
                   <div className="">
