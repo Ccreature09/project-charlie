@@ -23,5 +23,6 @@ export interface User {
   username: string;
   badges: string[];
   levels: number[];
+  completedLevels: number[];
   dateOfRegistration: Timestamp | FieldValue;
 }
