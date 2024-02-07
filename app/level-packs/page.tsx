@@ -46,7 +46,7 @@ export default function Page() {
         <div className="flex flex-wrap justify-center items-center gap-6 p-8">
           {cardData.map((card, index) => (
             <div key={index} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
-              <Link href={`/level-packs/${card.title}`}>
+              <Link href={`/level-packs/${encodeURIComponent(card.title)}`}>
                 <Card className="bg-opacity-10 hover:bg-opacity-40 transition-all duration-200 bg-white">
                   <CardContent>
                     <img
