@@ -32,6 +32,7 @@ export default function UnityLevelEmbed({
   useEffect(() => {
     requestFullscreen(true);
   }, [onFullscreen]);
+
   useEffect(() => {
     setLoadingPercentage(Math.round(loadingProgression * 100));
 
@@ -58,21 +59,24 @@ export default function UnityLevelEmbed({
   }
 
   return (
-    <div className="aspect-[16/9] relative">
+    <div className="w-full h-full flex justify-center items-center relative">
       {level && (
         <>
           {isLoaded === false && (
-            <div className="absolute top-0 left-0 w-full h-full bg-gray-400 flex, justify-center items-center">
+            <div className="absolute top-0 left-0 w-full h-full bg-gray-400 flex flex-col justify-center items-center">
               <p className="text-6xl font-black text-center my-32">
                 Loading...
               </p>
+
               <Progress
-                className="w-1/2 flex mx-auto"
+                className="w-1/2 mx-auto"
                 value={loadingPercentage}
               ></Progress>
             </div>
           )}
-          <Unity unityProvider={unityProvider} className="w-full h-full" />
+          <div className="aspect-[16/9] w-full h-full ">
+            <Unity unityProvider={unityProvider} className="w-full h-full" />
+          </div>
         </>
       )}
     </div>
