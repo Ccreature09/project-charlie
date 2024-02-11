@@ -24,5 +24,6 @@ export interface User {
   badges: string[];
   levels: number[];
   completedLevels: number[];
+  likedLevels: number[];
   dateOfRegistration: Timestamp | FieldValue;
 }
