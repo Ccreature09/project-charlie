@@ -24,6 +24,7 @@ const backgroundImageStyle = {
   backgroundImage:
     "url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')",
   backgroundSize: "cover",
+  minHeight: "100vh",
   width: "100%",
 };
 
@@ -96,13 +97,16 @@ export default function Page() {
             <Carousel className=" mx-20">
               <CarouselContent>
                 {newLevels.map((level, index) => (
-                  <CarouselItem key={index} className="basis-1/3">
+                  <CarouselItem
+                    key={index}
+                    className=" md:basis-1/2 lg:basis-1/3"
+                  >
                     <Card>
                       <CardHeader>
                         <CardTitle>{level.name}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <img src={level.imgURL} alt="" />
+                        <img src={level.imgURL} className="" alt="" />
                       </CardContent>
                       <CardFooter>
                         <Link href={`/level/${level.id}`}>
@@ -144,7 +148,10 @@ export default function Page() {
             <Carousel className="mx-20">
               <CarouselContent>
                 {likedLevels.map((level, index) => (
-                  <CarouselItem key={index} className="basis-1/3">
+                  <CarouselItem
+                    key={index}
+                    className=" md:basis-1/2 lg:basis-1/3"
+                  >
                     <Card>
                       <CardHeader>
                         <CardTitle>{level.name}</CardTitle>
