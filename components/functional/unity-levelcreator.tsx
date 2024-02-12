@@ -1,21 +1,26 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Unity, useUnityContext } from "react-unity-webgl";
-import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
 
 export default function UnityLevelEmbed({
-  onGameStatusChange,
+  onFetchSeed,
+  onFetchScreenshot,
   onScreenshot,
   onFullscreen,
+  onHideUI,
+  onGridSize,
 }: {
-  onGameStatusChange: (status: string) => void;
+  onFetchSeed: (status: string) => void;
+  onFetchScreenshot: (status: string | undefined) => void;
   onScreenshot: boolean;
-
   onFullscreen: boolean;
+  onHideUI: boolean;
+  onGridSize: string;
 }) {
   const [loadingPercentage, setLoadingPercentage] = useState<number>(0);
-  const [gameStatus, setGameStatus] = useState("");
+  const [hideUI, setHideUI] = useState(false);
 
+  const [gameStatus, setGameStatus] = useState("");
   const {
     unityProvider,
     sendMessage,
@@ -23,6 +28,8 @@ export default function UnityLevelEmbed({
     loadingProgression,
     requestFullscreen,
     takeScreenshot,
+    addEventListener,
+    removeEventListener,
   } = useUnityContext({
     loaderUrl: "build/level-creator/unity.loader.js",
     dataUrl: "build/level-creator/unity.data",
@@ -39,33 +46,41 @@ export default function UnityLevelEmbed({
 
   useEffect(() => {
     const dataUrl = takeScreenshot("image/jpg", 0.5);
+    onFetchScreenshot(dataUrl);
     //   newWindow.document.write('<img src="' + dataUrl + '" />');
-    console.log(dataUrl);
   }, [onScreenshot]);
 
   useEffect(() => {
+    sendMessage("GameManager", "FetchData", onGridSize);
+  }, [onGridSize]);
+
+  useEffect(() => {
+    setHideUI(!hideUI);
+    console.log(hideUI);
+    sendMessage(
+      "GameManager",
+      "FetchData",
+      hideUI ? "UIHide:true" : "UIHide:false"
+    );
+  }, [onHideUI]);
+
+  useEffect(() => {
     setLoadingPercentage(Math.round(loadingProgression * 100));
-
-    if (isLoaded) {
-      const timeoutId = setTimeout(() => {
-        SendData();
-      }, 2500);
-
-      return () => clearTimeout(timeoutId);
-    }
+    isLoaded && sendMessage("GameManager", "FetchData", "Instantiate:3,3");
   }, [isLoaded, loadingProgression]);
-
-  function SendData() {
-    const combinedData = "true";
-    console.log("TEST:  " + combinedData);
-    sendMessage("GameManager", "FetchData", combinedData);
-  }
 
   const FetchData = useCallback((data: any) => {
     setGameStatus(data);
-    onGameStatusChange(data);
+    onFetchSeed(data);
     console.log(data);
   }, []);
+
+  useEffect(() => {
+    addEventListener("SendData", FetchData);
+    return () => {
+      removeEventListener("SendData", FetchData);
+    };
+  }, [addEventListener, removeEventListener, FetchData]);
 
   return (
     <div className="w-full h-full flex justify-center items-center relative">

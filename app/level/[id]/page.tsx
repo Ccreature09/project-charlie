@@ -271,7 +271,10 @@ export default function Page({ params }: { params: { id: string } }) {
     <>
       <div style={backgroundImageStyle} className="h-screen flex-row bg-cover">
         <Navbar></Navbar>
-        <div style={backgroundImageStyle} className="flex flex-col lg:flex-row">
+        <div
+          style={backgroundImageStyle}
+          className="flex flex-col mt-5 lg:flex-row"
+        >
           {isSmallScreen ? (
             <>
               <div className="mx-5 mb-5">

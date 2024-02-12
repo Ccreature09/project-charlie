@@ -47,6 +47,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { onAuthStateChanged } from "firebase/auth";
 import UserForm from "@/components/functional/signIn";
 import { Separator } from "@/components/ui/separator";
@@ -85,18 +87,19 @@ export default function Page() {
   };
 
   const [newLevel, setNewLevel] = useState(initialLevelState);
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
+  const [width, setWidth] = useState(3);
+  const [height, setHeight] = useState(3);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [levelCount, setLevelCount] = useState(0);
   const [user, setUser] = useState<User | null>(null);
-  const [description, setDescription] = useState("");
   const levelsCollectionRef = collection(db, "levels");
-  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [signInPopup, setsignInPopup] = useState(false);
-  const [gameStatus, setGameStatus] = useState("");
+  const [seed, setSeed] = useState("");
   const [requestFullscreen, setRequestFullscreen] = useState(false);
   const [requestScreenshot, setRequestScreenshot] = useState(false);
+  const [requestHideUI, setRequestHideUI] = useState(false);
+
+  const [thumbnail, setThumbnail] = useState<string>();
 
   const handleGoogleSignIn = async () => {
     try {
@@ -116,10 +119,10 @@ export default function Page() {
         const userData = {
           uid: user.uid,
           pfp: user.photoURL,
-          username: user.displayName || "", // You can adjust this as needed
+          username: user.displayName || "",
           dateOfRegistration: serverTimestamp(),
-          badges: [], // Initialize with an empty array
-          levels: [], // Initialize with an empty array
+          badges: [],
+          levels: [],
         };
 
         // Add the new user document to the "users" collection
@@ -135,6 +138,7 @@ export default function Page() {
       console.error("Google sign-in failed:", error);
     }
   };
+
   const fetchLevelCount = async () => {
     const snapshot = await getDocs(levelsCollectionRef);
     setLevelCount(snapshot.size);
@@ -159,19 +163,19 @@ export default function Page() {
 
   const handleSubmit = async () => {
     try {
-      // Add the new level document to the "levels" collection
       await addDoc(levelsCollectionRef, {
         ...newLevel,
+        seed: seed,
+        likes: 0,
         grid: `${width}x${height}`,
         id: levelCount,
-        description: description,
         author: user?.displayName,
         authorUID: user?.uid,
         pfp: user?.photoURL,
         publishDate: serverTimestamp(),
+        imgURL: thumbnail,
       });
 
-      // Query the users collection for the level's author UID
       const userQuery = query(
         collection(db, "users"),
         where("uid", "==", user?.uid)
@@ -182,7 +186,6 @@ export default function Page() {
       if (!userQuerySnapshot.empty) {
         const userDoc = userQuerySnapshot.docs[0];
 
-        // Update the levels array in the user document
         const userData = userDoc.data();
         const updatedLevels = [...userData.levels, levelCount];
 
@@ -191,9 +194,9 @@ export default function Page() {
     } catch (error) {
       console.error("Error creating level:", error);
     } finally {
-      setDescription("");
-      setWidth(0);
-      setHeight(0);
+      setThumbnail("");
+      setWidth(3);
+      setHeight(3);
       setNewLevel(initialLevelState);
     }
   };
@@ -225,7 +228,7 @@ export default function Page() {
         <Navbar></Navbar>
         <div
           style={backgroundImageStyle}
-          className=" flex flex-col lg:flex-row"
+          className=" flex flex-col mt-5 lg:flex-row"
         >
           <AlertDialog open={signInPopup}>
             <AlertDialogContent>
@@ -269,6 +272,7 @@ export default function Page() {
                   <h2 className="text-2xl text-center  font-bold mb-4">
                     Create New Level!
                   </h2>
+
                   <div>
                     <p className=" text-lg mb-2">Name:</p>
                     <Input
@@ -277,48 +281,73 @@ export default function Page() {
                       onChange={(e) =>
                         setNewLevel({ ...newLevel, name: e.target.value })
                       }
-                      className=" p-2 rounded mb-4 w-full"
+                      className="p-2 rounded mb-4 w-full text-black"
                     />
+                  </div>
+                  <div>
+                    <p className=" text-lg mb-2">
+                      Thumbnail: {!thumbnail && "none..."}
+                    </p>
+
+                    <img src={thumbnail} alt="" />
                   </div>
                   <div>
                     <p className=" text-lg mb-2">Description:</p>
                     <ReactQuill
                       theme="snow"
                       modules={{ toolbar: toolbarOptions }}
-                      value={description}
-                      onChange={(value) => setDescription(value)}
-                      className="overflow-y-auto max-h-[600px] text-white"
+                      value={newLevel.description}
+                      onChange={(value) =>
+                        setNewLevel({ ...newLevel, description: value })
+                      }
+                      className="overflow-y-auto max-h-[600px] "
                     />
                     <div className="mt-10">
-                      <p className="text-white">Grid size (width x height):</p>
+                      <p className="">Grid size (width x height):</p>
                       <div className="flex gap-3">
                         <div className="w-1/2">
-                          <p className="text-white mt-5">Width:</p>
+                          <p className=" mt-5">Width:</p>
                           <Input
                             type="number"
-                            placeholder="5"
+                            placeholder="3"
                             value={width}
-                            onChange={(e) => setWidth(Number(e.target.value))}
-                            className="text-black"
-                          ></Input>
+                            onChange={(e) =>
+                              setWidth(
+                                Math.min(
+                                  Math.max(Number(e.target.value), 1),
+                                  20
+                                )
+                              )
+                            }
+                            min={1}
+                            max={20}
+                          />
                         </div>
                         <div className="1/2">
-                          <p className="text-white mt-5">Height:</p>
+                          <p className=" mt-5">Height:</p>
                           <Input
                             type="number"
-                            placeholder="5"
+                            placeholder="3"
                             value={height}
-                            onChange={(e) => setHeight(Number(e.target.value))}
-                            className="text-black"
-                          ></Input>
+                            onChange={(e) =>
+                              setHeight(
+                                Math.min(
+                                  Math.max(Number(e.target.value), 1),
+                                  20
+                                )
+                              )
+                            }
+                            min={0}
+                            max={20}
+                          />
                         </div>
                       </div>
-                      <p className="text-white mt-3">
+                      <p className=" mt-3">
                         Grid Size: {width} x {height}
                       </p>
                       <div className="flex gap-3">
                         <div className="w-1/2">
-                          <p className="text-white mt-5">Difficulty:</p>
+                          <p className=" mt-5">Difficulty:</p>
                           <Select
                             onValueChange={(e) =>
                               setNewLevel({ ...newLevel, difficulty: e })
@@ -338,7 +367,7 @@ export default function Page() {
                           </Select>
                         </div>
                         <div className="w-1/2">
-                          <p className="text-white mt-5">Blocks:</p>
+                          <p className=" mt-5">Blocks:</p>
 
                           <Select
                             onValueChange={(e) =>
@@ -376,11 +405,16 @@ export default function Page() {
                 <div className="w-full lg:w-[67%]  flex flex-col mr-10">
                   <div>
                     <UnityLevelEmbed
-                      onGameStatusChange={(status) => {
-                        setGameStatus(status);
+                      onFetchSeed={(status) => {
+                        setSeed(status);
                       }}
                       onFullscreen={requestFullscreen}
                       onScreenshot={requestScreenshot}
+                      onHideUI={requestHideUI}
+                      onFetchScreenshot={(image) => {
+                        setThumbnail(image);
+                      }}
+                      onGridSize={`Instantiate:${width},${height}`}
                     />
                   </div>
 
@@ -421,15 +455,51 @@ export default function Page() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
                         className="mr-3"
                       >
-                        <polyline points="15 3 21 3 21 9"></polyline>
-                        <polyline points="9 21 3 21 3 15"></polyline>
-                        <line x1="21" y1="3" x2="14" y2="10"></line>
-                        <line x1="3" y1="21" x2="10" y2="14"></line>
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                      </svg>
+                      Hide UI
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setRequestScreenshot((prevState) => !prevState);
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        className="mr-3"
+                      >
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
                       </svg>
                       Screenshot
                     </Button>
@@ -439,117 +509,161 @@ export default function Page() {
             </>
           ) : (
             <>
-              <div className="w-1/4 h-[89vh] mx-5 p-5 bg-white text-black rounded-lg">
-                <h2 className="text-2xl text-center  font-bold mb-4">
-                  Create New Level!
+              <div className="w-1/4 h-[89vh] mx-5 p-5 relative bg-white text-black rounded-lg">
+                <h2 className="text-2xl text-center font-bold mb-4">
+                  Create Level
                 </h2>
-                <div>
-                  <p className=" text-lg mb-2">Name:</p>
-                  <Input
-                    type="text"
-                    value={newLevel.name}
-                    onChange={(e) =>
-                      setNewLevel({ ...newLevel, name: e.target.value })
-                    }
-                    className="p-2 rounded mb-4 w-full text-black"
-                  />
-                </div>
-                <div>
-                  <p className=" text-lg mb-2">Description:</p>
-                  <ReactQuill
-                    theme="snow"
-                    modules={{ toolbar: toolbarOptions }}
-                    value={description}
-                    onChange={(value) => setDescription(value)}
-                    className="overflow-y-auto max-h-[600px] "
-                  />
-                  <div className="mt-10">
-                    <p className="">Grid size (width x height):</p>
-                    <div className="flex gap-3">
-                      <div className="w-1/2">
-                        <p className=" mt-5">Width:</p>
-                        <Input
-                          type="number"
-                          placeholder="5"
-                          value={width}
-                          onChange={(e) => setWidth(Number(e.target.value))}
-                        ></Input>
-                      </div>
-                      <div className="1/2">
-                        <p className=" mt-5">Height:</p>
-                        <Input
-                          type="number"
-                          placeholder="5"
-                          value={height}
-                          onChange={(e) => setHeight(Number(e.target.value))}
-                          className="text-black"
-                        ></Input>
+                <Tabs defaultValue="details">
+                  <TabsList className="flex mx-auto w-full">
+                    <TabsTrigger value="details">Details</TabsTrigger>
+                    <TabsTrigger value="description">Description</TabsTrigger>
+                    <TabsTrigger value="grid">Grid</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="details">
+                    <div>
+                      <p className=" text-lg mb-2">Name:</p>
+                      <Input
+                        type="text"
+                        value={newLevel.name}
+                        onChange={(e) =>
+                          setNewLevel({ ...newLevel, name: e.target.value })
+                        }
+                        className="p-2 rounded mb-4 w-full text-black"
+                      />
+                    </div>
+                    <div>
+                      <p className=" text-lg mb-2">
+                        Thumbnail: {!thumbnail && "none..."}
+                      </p>
+
+                      <img src={thumbnail} alt="" />
+                    </div>
+                    <div>
+                      <div className="mt-10">
+                        <div className="flex gap-3">
+                          <div className="w-1/2">
+                            <p className=" mt-5">Difficulty:</p>
+                            <Select
+                              onValueChange={(e) =>
+                                setNewLevel({ ...newLevel, difficulty: e })
+                              }
+                              value={newLevel.difficulty}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Difficulty" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="easy">Easy</SelectItem>
+                                <SelectItem value="medium">Medium</SelectItem>
+                                <SelectItem value="hard">Hard</SelectItem>
+                                <SelectItem value="insane">Insane</SelectItem>
+                                <SelectItem value="master">Master</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="w-1/2">
+                            <p className=" mt-5">Blocks:</p>
+
+                            <Select
+                              onValueChange={(e) =>
+                                setNewLevel({
+                                  ...newLevel,
+                                  unlimited: e == "unlimited" ? true : false,
+                                })
+                              }
+                              value={
+                                newLevel.unlimited ? "unlimited" : "limited"
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Blocks" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="unlimited">
+                                  Unlimited
+                                </SelectItem>
+                                <SelectItem value="limited">Limited</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <p className="text-white mt-3">
-                      Grid Size: {width} x {height}
+                  </TabsContent>
+                  <TabsContent value="description">
+                    <p className=" text-lg mb-2">Description:</p>
+                    <ReactQuill
+                      theme="snow"
+                      modules={{ toolbar: toolbarOptions }}
+                      value={newLevel.description}
+                      onChange={(value) =>
+                        setNewLevel({ ...newLevel, description: value })
+                      }
+                      className="overflow-y-auto max-h-[500px] "
+                    />
+                  </TabsContent>
+                  <TabsContent value="grid">
+                    <p className="text-black text-center text-5xl my-5 font-semibold">
+                      Grid size
                     </p>
-                    <div className="flex gap-3">
-                      <div className="w-1/2">
-                        <p className="text-white mt-5">Difficulty:</p>
-                        <Select
-                          onValueChange={(e) =>
-                            setNewLevel({ ...newLevel, difficulty: e })
+                    <div className="flex justify-center my-20 gap-3">
+                      <div className="w-1/2 flex flex-col items-center bg-gray-300 py-32 px-4 rounded-2xl">
+                        <p className="text-5xl font-bold mb-5">Width</p>
+                        <Input
+                          type="number"
+                          className="w-full text-center text-3xl border border-gray-300 rounded-md"
+                          placeholder="3"
+                          value={width}
+                          onChange={(e) =>
+                            setWidth(
+                              Math.min(Math.max(Number(e.target.value), 1), 20)
+                            )
                           }
-                          value={newLevel.difficulty}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Difficulty" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="easy">Easy</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="hard">Hard</SelectItem>
-                            <SelectItem value="insane">Insane</SelectItem>
-                            <SelectItem value="master">Master</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          min={1}
+                          max={20}
+                        />
                       </div>
-                      <div className="w-1/2">
-                        <p className="text-white mt-5">Blocks:</p>
+                      <p className="flex my-auto text-3xl font-black">x</p>
+                      <div className="w-1/2 flex flex-col items-center bg-gray-300 py-32 px-4 rounded-2xl">
+                        <p className="text-5xl font-bold mb-5">Height</p>
 
-                        <Select
-                          onValueChange={(e) =>
-                            setNewLevel({
-                              ...newLevel,
-                              unlimited: e == "unlimited" ? true : false,
-                            })
+                        <Input
+                          type="number"
+                          className="w-full text-center text-3xl border border-gray-300 rounded-md"
+                          placeholder="3"
+                          value={height}
+                          onChange={(e) =>
+                            setHeight(
+                              Math.min(Math.max(Number(e.target.value), 1), 20)
+                            )
                           }
-                          value={newLevel.unlimited ? "unlimited" : "limited"}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Blocks" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="unlimited">Unlimited</SelectItem>
-                            <SelectItem value="limited">Limited</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          min={1}
+                          max={20}
+                        />
                       </div>
                     </div>
-
-                    <Button
-                      onClick={handleSubmit}
-                      className="flex w-full mt-10"
-                    >
-                      Submit
-                    </Button>
-                  </div>
-                </div>
+                  </TabsContent>
+                </Tabs>
+                <Button
+                  onClick={handleSubmit}
+                  className="absolute bottom-5 mx-auto flex  w-[90%] mt-10"
+                >
+                  Submit
+                </Button>
               </div>
               <div className="w-full lg:w-[67%]  flex flex-col mr-10">
                 <div>
                   <UnityLevelEmbed
-                    onGameStatusChange={(status) => {
-                      setGameStatus(status);
+                    onFetchSeed={(status) => {
+                      setSeed(status);
+                    }}
+                    onFetchScreenshot={(image) => {
+                      setThumbnail(image);
                     }}
                     onFullscreen={requestFullscreen}
                     onScreenshot={requestScreenshot}
+                    onHideUI={requestHideUI}
+                    onGridSize={`Instantiate:${width},${height}`}
                   />
                 </div>
 
@@ -580,6 +694,36 @@ export default function Page() {
                   </Button>
                   <Button
                     onClick={() => {
+                      setRequestHideUI((prevState) => !prevState);
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="mr-3"
+                    >
+                      <rect
+                        x="3"
+                        y="3"
+                        width="18"
+                        height="18"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    Hide UI
+                  </Button>
+                  <Button
+                    onClick={() => {
                       setRequestScreenshot((prevState) => !prevState);
                     }}
                   >
@@ -590,15 +734,21 @@ export default function Page() {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
                       className="mr-3"
                     >
-                      <polyline points="15 3 21 3 21 9"></polyline>
-                      <polyline points="9 21 3 21 3 15"></polyline>
-                      <line x1="21" y1="3" x2="14" y2="10"></line>
-                      <line x1="3" y1="21" x2="10" y2="14"></line>
+                      <rect
+                        x="3"
+                        y="3"
+                        width="18"
+                        height="18"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
                     </svg>
                     Screenshot
                   </Button>
