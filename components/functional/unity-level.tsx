@@ -53,7 +53,7 @@ export default function UnityLevelEmbed({
   }, [addEventListener, removeEventListener, FetchData]);
 
   function SendData() {
-    const combinedData = `//LEVEL_NAME:${level?.name}//,AUTHOR_NAME:${level?.author}//SEED:,${level?.seed}//`;
+    const combinedData = `//LEVEL_NAME:${level?.name}//AUTHOR_NAME:${level?.author}//SEED:${level?.seed}///`;
     console.log("TEST:  " + combinedData);
     sendMessage("GameManager", "FetchData", combinedData);
   }
