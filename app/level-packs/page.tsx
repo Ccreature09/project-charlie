@@ -2,12 +2,7 @@ import { Navbar } from "@/components/functional/navbar";
 import React from "react";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-const backgroundImageStyle = {
-  backgroundImage:
-    "url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')",
-  backgroundSize: "cover",
-  width: "100%",
-};
+
 
 const cardData = [
   {
@@ -40,7 +35,7 @@ const cardData = [
 export default function Page() {
   return (
     <>
-      <div style={backgroundImageStyle} className="h-screen flex-row">
+      <div  className="h-screen flex-row bg-cover min-h-[300vh] md:min-h-[150vh] lg:min-h-screen bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')]">
         <Navbar></Navbar>
 
         <div className="flex flex-wrap justify-center items-center gap-6 p-8">
@@ -64,6 +59,7 @@ export default function Page() {
           ))}
         </div>
       </div>
+      
     </>
   );
 }
