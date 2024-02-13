@@ -63,10 +63,10 @@ export default function UserList() {
   return (
     <>
       {mount && (
-        <div>
-          <Table className="w-full">
-            <TableHeader className="w-full">
-              <TableRow className="w-full mx-auto">
+        <div >
+          <Table >
+            <TableHeader>
+              <TableRow>
                 <TableHead className="text-center text-white">
                   User UID
                 </TableHead>
@@ -150,7 +150,6 @@ export default function UserList() {
                   3
                 </PaginationLink>
               </PaginationItem>
-              {/* ... other pages ... */}
               <PaginationItem>
                 <PaginationNext
                   onClick={() =>
