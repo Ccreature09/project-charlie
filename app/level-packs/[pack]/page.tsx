@@ -12,6 +12,11 @@ const backgroundImageStyle = {
   width: "100%",
 };
 
+const stripHtmlTags = (html: string): string => {
+  return html.replace(/<[^>]*>?/gm, '');
+};
+
+
 export default function Page({ params }: { params: { pack: string } }) {
   const [levels, setLevels] = useState<Level[]>([]);
   const [userData, setUserData] = useState<UserData>();
@@ -120,19 +125,22 @@ export default function Page({ params }: { params: { pack: string } }) {
                 <Link href={`/level/${level.id}`} key={level.id}>
                   <div className="flex items-center hover:bg-white hover:bg-opacity-10 px-6 py-3 rounded-xl justify-between mr-5">
                     <div className="flex items-center space-x-3">
+                      <div>
                       {userData?.completedLevels.includes(level.id) ? (
                         <CheckCircleIcon className="text-green-500 h-6 w-6" />
                       ) : (
                         <CircleIcon className="text-green-500 h-6 w-6" />
                       )}
+                      </div>
+                      
                       <div>
                         <h3 className="font-semibold">{level.name}</h3>
                         <p className="text-gray-400 text-sm">
-                          {level.description}
+                          {stripHtmlTags(level.description)}
                         </p>
                       </div>
                     </div>
-                    <Badge variant="secondary">{level.difficulty}</Badge>
+                    <Badge variant="secondary" className="mx-2">{level.difficulty}</Badge>
                   </div>
                 </Link>
               ))}
@@ -143,11 +151,7 @@ export default function Page({ params }: { params: { pack: string } }) {
   );
 }
 
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/iNoT1A3X4yU
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
+
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
