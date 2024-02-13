@@ -6,6 +6,7 @@ export default function UnityLevelEmbed({
   onFetchSeed,
   onFetchScreenshot,
   onScreenshot,
+  onDraftSeed,
   onFullscreen,
   onHideUI,
   onGridSize,
@@ -13,6 +14,7 @@ export default function UnityLevelEmbed({
   onFetchSeed: (status: string) => void;
   onFetchScreenshot: (status: string | undefined) => void;
   onScreenshot: boolean;
+  onDraftSeed:string;
   onFullscreen: boolean;
   onHideUI: boolean;
   onGridSize: string;
@@ -52,11 +54,12 @@ export default function UnityLevelEmbed({
 
   useEffect(() => {
     sendMessage("GameManager", "FetchData", onGridSize);
+    
   }, [onGridSize]);
+
 
   useEffect(() => {
     setHideUI(!hideUI);
-    console.log(hideUI);
     sendMessage(
       "GameManager",
       "FetchData",
@@ -64,15 +67,26 @@ export default function UnityLevelEmbed({
     );
   }, [onHideUI]);
 
+    useEffect(() => {
+      sendMessage("GameManager", "FetchData", `InstantiateDraft:${onDraftSeed}`);
+    }, [onDraftSeed])
+    
+
   useEffect(() => {
     setLoadingPercentage(Math.round(loadingProgression * 100));
-    isLoaded && sendMessage("GameManager", "FetchData", "Instantiate:3,3");
+    if (isLoaded) {
+      if (onDraftSeed != "") {
+        sendMessage("GameManager", "FetchData", `InstantiateDraft:${onDraftSeed}`);
+      }else{
+        sendMessage("GameManager", "FetchData", "Instantiate:3,3");
+      }
+    }
+    
   }, [isLoaded, loadingProgression]);
 
   const FetchData = useCallback((data: any) => {
     setGameStatus(data);
     onFetchSeed(data);
-    console.log(data);
   }, []);
 
   useEffect(() => {
