@@ -11,6 +11,8 @@ import {
   query,
   where,
   setDoc,
+  updateDoc,
+  deleteField
 } from "firebase/firestore";
 import {
   AlertDialog,
@@ -26,7 +28,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import React, { useEffect, useState } from "react";
-import { Level } from "@/interfaces";
+import { User as UserData, Level } from "@/interfaces";
 import { Navbar } from "@/components/functional/navbar";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 const backgroundImageStyle = {
@@ -92,12 +94,15 @@ export default function Page() {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [levelCount, setLevelCount] = useState(0);
   const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<UserData>();
   const levelsCollectionRef = collection(db, "levels");
   const [signInPopup, setsignInPopup] = useState(false);
   const [seed, setSeed] = useState("");
   const [requestFullscreen, setRequestFullscreen] = useState(false);
+  const [requestDraftSeed, setRequestDraftSeed] = useState("");
   const [requestScreenshot, setRequestScreenshot] = useState(false);
   const [requestHideUI, setRequestHideUI] = useState(false);
+  const [error, setError] = useState("");
 
   const [thumbnail, setThumbnail] = useState<string>();
 
@@ -127,9 +132,7 @@ export default function Page() {
 
         // Add the new user document to the "users" collection
         await setDoc(userDocRef, userData);
-        console.log("New user created:", userData);
       } else {
-        console.log("User already exists:");
       }
 
       // Set the user state
@@ -139,10 +142,40 @@ export default function Page() {
     }
   };
 
-  const fetchLevelCount = async () => {
-    const snapshot = await getDocs(levelsCollectionRef);
-    setLevelCount(snapshot.size);
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      const snapshot = await getDocs(levelsCollectionRef);
+      setLevelCount(snapshot.size);
+  
+      if (user?.uid) {
+        const userQuery = query(
+          collection(db, "users"),
+          where("uid", "==", user?.uid)
+        );
+        const userSnapshot = await getDocs(userQuery);
+        console.log("SNAPSHOT: "+!userSnapshot.empty);
+        if (!userSnapshot.empty) {
+          const userData = userSnapshot.docs[0].data() as UserData;
+          setUserData(userData);
+          console.log("SNAPSHOT USERDATA: "+userData)
+          if (userData.draftLevel) {
+            console.log("SETTING NEWLEVEL TO DRAFTLEVEL")
+            setNewLevel(userData.draftLevel);
+            console.log("REQUESTING: "+ userData.draftLevel.seed)
+            setRequestDraftSeed(userData.draftLevel.seed)
+          }
+        }
+      }
+    };
+  
+    const unsubscribeSnapshot = updateLevelCountOnSnapshot();
+    fetchData();
+  
+    return () => {
+      unsubscribeSnapshot();
+    };
+  }, [user?.uid]);
+  
 
   const updateLevelCountOnSnapshot = () => {
     const unsubscribe = onSnapshot(levelsCollectionRef, (snapshot) => {
@@ -151,55 +184,82 @@ export default function Page() {
 
     return unsubscribe;
   };
-
-  useEffect(() => {
-    const unsubscribeSnapshot = updateLevelCountOnSnapshot();
-    fetchLevelCount();
-
-    return () => {
-      unsubscribeSnapshot();
-    };
-  }, []);
-
-  const handleSubmit = async () => {
-    try {
-      await addDoc(levelsCollectionRef, {
-        ...newLevel,
-        seed: seed,
-        likes: 0,
-        grid: `${width}x${height}`,
-        id: levelCount,
-        author: user?.displayName,
-        authorUID: user?.uid,
-        pfp: user?.photoURL,
-        publishDate: serverTimestamp(),
-        imgURL: thumbnail,
-      });
-
-      const userQuery = query(
-        collection(db, "users"),
-        where("uid", "==", user?.uid)
-      );
-
-      const userQuerySnapshot = await getDocs(userQuery);
-
-      if (!userQuerySnapshot.empty) {
-        const userDoc = userQuerySnapshot.docs[0];
-
-        const userData = userDoc.data();
-        const updatedLevels = [...userData.levels, levelCount];
-
-        await setDoc(userDoc.ref, { levels: updatedLevels }, { merge: true });
+    useEffect(() => {
+      if (seed) {
+        setNewLevel({...newLevel, seed: seed})
+        if (newLevel.seed == seed) {
+       saveDraftLevelToFirestore("seed update");
+        }
       }
-    } catch (error) {
-      console.error("Error creating level:", error);
-    } finally {
-      setThumbnail("");
-      setWidth(3);
-      setHeight(3);
-      setNewLevel(initialLevelState);
-    }
-  };
+     
+      
+    }, [newLevel.seed, seed])
+
+    useEffect(() => {
+      thumbnail && setNewLevel({...newLevel, imgURL: thumbnail})
+     saveDraftLevelToFirestore("thumbnail");
+    }, [thumbnail, newLevel.imgURL])
+    
+
+    const handleSubmit = async () => {
+      try {
+        if (newLevel.name && newLevel.seed && newLevel.imgURL && newLevel.difficulty) {
+          console.log("Adding level...");
+    
+          await addDoc(levelsCollectionRef, {
+            ...newLevel,
+            seed: seed,
+            likes: 0,
+            grid: `${width}x${height}`,
+            id: levelCount,
+            author: user?.displayName,
+            authorUID: user?.uid,
+            pfp: user?.photoURL,
+            publishDate: serverTimestamp(),
+          });
+    
+          const userQuery = query(
+            collection(db, "users"),
+            where("uid", "==", user?.uid)
+          );
+    
+          const userQuerySnapshot = await getDocs(userQuery);
+    
+          if (!userQuerySnapshot.empty) {
+            const userDoc = userQuerySnapshot.docs[0];
+            const userData = userDoc.data();
+    
+            // Ensure userData.levels is always an array
+            const updatedLevels = Array.isArray(userData.levels) ? [...userData.levels, levelCount] : [levelCount];
+
+            setError("");
+            setThumbnail("");
+            setWidth(3);
+            setHeight(3);
+            setSeed("");
+            setNewLevel(initialLevelState);
+
+
+            console.log("Deleting draft...");
+            await setDoc(userDoc.ref, { 
+              levels: updatedLevels, 
+            }, { merge: true });
+
+            await updateDoc(userDoc.ref, {
+              draftLevel: deleteField()
+          }, );
+          }
+          
+        } else {
+          console.log("Invalid Data");
+          setError("Invalid Data");
+        }
+      } catch (error) {
+        console.error("Error creating level:", error);
+      }
+    };
+    
+  
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -221,6 +281,32 @@ export default function Page() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  
+  const saveDraftLevelToFirestore = async (from: string) => {
+    console.log("SAVING DATE TO FB from " + from)
+    console.log(newLevel);
+    try {
+      if (user?.uid) {
+        const userQuery = query(
+          collection(db, "users"),
+          where("uid", "==", user.uid)
+        );
+        
+        const querySnapshot = await getDocs(userQuery);
+        
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const userDocRef = doc(db, "users", userDoc.id);
+          console.log("SUBMITING "+ newLevel.seed)
+          await setDoc(userDocRef, { draftLevel: newLevel }, { merge: true });
+
+        }
+      }
+    } catch (error) {
+      console.error("Error saving draft level:", error);
+    }
+  };
 
   return (
     <>
@@ -269,136 +355,162 @@ export default function Page() {
             <>
               <div className="mx-5 mb-5">
                 <div className="w-full h-full flex flex-col text-black p-5  bg-white rounded-lg">
-                  <h2 className="text-2xl text-center  font-bold mb-4">
-                    Create New Level!
-                  </h2>
+                <h2 className="text-2xl text-center font-bold mb-4">
+                  Създай ниво
+                </h2>
+                <Tabs defaultValue="details">
+                  <TabsList className="flex mx-auto w-full">
+                    <TabsTrigger value="details">Details</TabsTrigger>
+                    <TabsTrigger value="description">Description</TabsTrigger>
+                    <TabsTrigger value="grid">Grid</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="details">
+                    <div>
+                      <p className=" text-lg mb-2">Name:</p>
+                      <Input
+                      onBlur={()=> saveDraftLevelToFirestore("blur name")}
 
-                  <div>
-                    <p className=" text-lg mb-2">Name:</p>
-                    <Input
-                      type="text"
-                      value={newLevel.name}
-                      onChange={(e) =>
-                        setNewLevel({ ...newLevel, name: e.target.value })
-                      }
-                      className="p-2 rounded mb-4 w-full text-black"
-                    />
-                  </div>
-                  <div>
-                    <p className=" text-lg mb-2">
-                      Thumbnail: {!thumbnail && "none..."}
-                    </p>
+                        type="text"
+                        value={newLevel.name}
+                        onChange={(e) =>
+                          setNewLevel({ ...newLevel, name: e.target.value })
+                        }
+                        className="p-2 rounded mb-4 w-full text-black"
+                      />
+                    </div>
+                    <div>
+                      <p className=" text-lg mb-2">
+                        Thumbnail: {!newLevel.imgURL && "none..."}
+                      </p>
 
-                    <img src={thumbnail} alt="" />
-                  </div>
-                  <div>
+                      <img src={newLevel.imgURL} alt="" />
+                    </div>
+                    <div>
+                      <div className="mt-10">
+                        <div className="flex gap-3">
+                          <div className="w-1/2">
+                            <p className=" mt-5">Difficulty:</p>
+                            <Select
+                              onValueChange={(e) =>
+                                setNewLevel({ ...newLevel, difficulty: e })
+                              }
+                              value={newLevel.difficulty}
+                            >
+                              <SelectTrigger
+                      onBlur={()=> saveDraftLevelToFirestore("blur difficulty")}
+                      >
+                                <SelectValue placeholder="Difficulty" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="easy">Easy</SelectItem>
+                                <SelectItem value="medium">Medium</SelectItem>
+                                <SelectItem value="hard">Hard</SelectItem>
+                                <SelectItem value="insane">Insane</SelectItem>
+                                <SelectItem value="master">Master</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="w-1/2">
+                            <p className=" mt-5">Blocks:</p>
+
+                            <Select
+                            
+                              onValueChange={(e) =>
+                                setNewLevel({
+                                  ...newLevel,
+                                  unlimited: e == "unlimited" ? true : false,
+                                })
+                              }
+                              value={
+                                newLevel.unlimited ? "unlimited" : "limited"
+                              }
+                            >
+                              <SelectTrigger
+                      onBlur={()=> saveDraftLevelToFirestore("blur unlim")}
+
+                              >
+                                <SelectValue placeholder="Blocks" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="unlimited">
+                                  Unlimited
+                                </SelectItem>
+                                <SelectItem value="limited">Limited</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="description">
                     <p className=" text-lg mb-2">Description:</p>
                     <ReactQuill
+                      onBlur={()=> saveDraftLevelToFirestore("blur desc")}
+
                       theme="snow"
                       modules={{ toolbar: toolbarOptions }}
                       value={newLevel.description}
                       onChange={(value) =>
                         setNewLevel({ ...newLevel, description: value })
                       }
-                      className="overflow-y-auto max-h-[600px] "
+                      className="overflow-y-auto max-h-[500px] "
                     />
-                    <div className="mt-10">
-                      <p className="">Grid size (width x height):</p>
-                      <div className="flex gap-3">
-                        <div className="w-1/2">
-                          <p className=" mt-5">Width:</p>
-                          <Input
-                            type="number"
-                            placeholder="3"
-                            value={width}
-                            onChange={(e) =>
-                              setWidth(
-                                Math.min(
-                                  Math.max(Number(e.target.value), 1),
-                                  20
-                                )
-                              )
-                            }
-                            min={1}
-                            max={20}
-                          />
-                        </div>
-                        <div className="1/2">
-                          <p className=" mt-5">Height:</p>
-                          <Input
-                            type="number"
-                            placeholder="3"
-                            value={height}
-                            onChange={(e) =>
-                              setHeight(
-                                Math.min(
-                                  Math.max(Number(e.target.value), 1),
-                                  20
-                                )
-                              )
-                            }
-                            min={0}
-                            max={20}
-                          />
-                        </div>
-                      </div>
-                      <p className=" mt-3">
-                        Grid Size: {width} x {height}
-                      </p>
-                      <div className="flex gap-3">
-                        <div className="w-1/2">
-                          <p className=" mt-5">Difficulty:</p>
-                          <Select
-                            onValueChange={(e) =>
-                              setNewLevel({ ...newLevel, difficulty: e })
-                            }
-                            value={newLevel.difficulty}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Difficulty" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="easy">Easy</SelectItem>
-                              <SelectItem value="medium">Medium</SelectItem>
-                              <SelectItem value="hard">Hard</SelectItem>
-                              <SelectItem value="insane">Insane</SelectItem>
-                              <SelectItem value="master">Master</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="w-1/2">
-                          <p className=" mt-5">Blocks:</p>
+                  </TabsContent>
+                  <TabsContent value="grid">
+                    <p className="text-black text-center text-5xl my-5 font-semibold">
+                      Grid size
+                    </p>
+                    <div className="flex justify-center my-20 gap-3">
+                      <div className="w-1/2 flex flex-col items-center my-auto bg-gray-300 py-16 px-4 rounded-2xl">
+                        <p className="text-2xl sm:text-5xl font-bold mb-5">Width</p>
+                        <Input
 
-                          <Select
-                            onValueChange={(e) =>
-                              setNewLevel({
-                                ...newLevel,
-                                unlimited: e == "unlimited" ? true : false,
-                              })
-                            }
-                            value={newLevel.unlimited ? "unlimited" : "limited"}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Blocks" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="unlimited">
-                                Unlimited
-                              </SelectItem>
-                              <SelectItem value="limited">Limited</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                          type="number"
+                          className="w-full text-center text-3xl border border-gray-300 rounded-md"
+                          placeholder="3"
+                          value={width}
+                          onChange={(e) =>
+                            setWidth(
+                              Math.min(Math.max(Number(e.target.value), 1), 20)
+                            )
+                          }
+                          min={1}
+                          max={20}
+                        />
                       </div>
+                      <p className="flex my-auto text-3xl font-black">x</p>
+                      <div className="w-1/2 flex flex-col items-center bg-gray-300 my-auto py-16 px-4 rounded-2xl">
+                        <p className="text-2xl sm:text-5xl font-bold mb-5">Height</p>
 
-                      <Button
-                        onClick={handleSubmit}
-                        className="flex w-full mt-10"
-                      >
-                        Submit
-                      </Button>
+                        <Input
+
+                          type="number"
+                          className="w-full text-center text-3xl border border-gray-300 rounded-md"
+                          placeholder="3"
+                          value={height}
+                          onChange={(e) =>
+                            setHeight(
+                              Math.min(Math.max(Number(e.target.value), 1), 20)
+                            )
+                          }
+                          min={1}
+                          max={20}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  </TabsContent>
+                </Tabs>
+                <p className="text-red-500">{error}</p>
+
+                <Button
+                  onClick={handleSubmit}
+                  className="absolute bottom-5 mx-auto flex  w-[90%] mt-10"
+                >
+                  Submit
+                </Button>
+                    
+                 
                 </div>
               </div>
               <div className=" mx-5 mb-5">
@@ -409,6 +521,7 @@ export default function Page() {
                         setSeed(status);
                       }}
                       onFullscreen={requestFullscreen}
+                      onDraftSeed={requestDraftSeed}
                       onScreenshot={requestScreenshot}
                       onHideUI={requestHideUI}
                       onFetchScreenshot={(image) => {
@@ -445,7 +558,7 @@ export default function Page() {
                     </Button>
                     <Button
                       onClick={() => {
-                        setRequestScreenshot((prevState) => !prevState);
+                        setRequestHideUI((prevState) => !prevState);
                       }}
                     >
                       <svg
@@ -511,8 +624,9 @@ export default function Page() {
             <>
               <div className="w-1/4 h-[89vh] mx-5 p-5 relative bg-white text-black rounded-lg">
                 <h2 className="text-2xl text-center font-bold mb-4">
-                  Create Level
+                  Създай ниво
                 </h2>
+                <Button onClick={()=>{console.log(newLevel)}}>TEST</Button>
                 <Tabs defaultValue="details">
                   <TabsList className="flex mx-auto w-full">
                     <TabsTrigger value="details">Details</TabsTrigger>
@@ -523,6 +637,8 @@ export default function Page() {
                     <div>
                       <p className=" text-lg mb-2">Name:</p>
                       <Input
+                      onBlur={()=> saveDraftLevelToFirestore("blur name2")}
+
                         type="text"
                         value={newLevel.name}
                         onChange={(e) =>
@@ -533,10 +649,10 @@ export default function Page() {
                     </div>
                     <div>
                       <p className=" text-lg mb-2">
-                        Thumbnail: {!thumbnail && "none..."}
+                        Thumbnail: {!newLevel.imgURL && "none..."}
                       </p>
 
-                      <img src={thumbnail} alt="" />
+                      <img src={newLevel.imgURL} alt="" />
                     </div>
                     <div>
                       <div className="mt-10">
@@ -549,7 +665,9 @@ export default function Page() {
                               }
                               value={newLevel.difficulty}
                             >
-                              <SelectTrigger>
+                              <SelectTrigger
+                      onBlur={()=> saveDraftLevelToFirestore("blur diff 2")}
+                      >
                                 <SelectValue placeholder="Difficulty" />
                               </SelectTrigger>
                               <SelectContent>
@@ -565,6 +683,7 @@ export default function Page() {
                             <p className=" mt-5">Blocks:</p>
 
                             <Select
+                            
                               onValueChange={(e) =>
                                 setNewLevel({
                                   ...newLevel,
@@ -575,7 +694,10 @@ export default function Page() {
                                 newLevel.unlimited ? "unlimited" : "limited"
                               }
                             >
-                              <SelectTrigger>
+                              <SelectTrigger
+                      onBlur={()=> saveDraftLevelToFirestore("blurr unl 2")}
+
+                              >
                                 <SelectValue placeholder="Blocks" />
                               </SelectTrigger>
                               <SelectContent>
@@ -593,6 +715,8 @@ export default function Page() {
                   <TabsContent value="description">
                     <p className=" text-lg mb-2">Description:</p>
                     <ReactQuill
+                      onBlur={()=> saveDraftLevelToFirestore("blur desc 2")}
+
                       theme="snow"
                       modules={{ toolbar: toolbarOptions }}
                       value={newLevel.description}
@@ -607,9 +731,10 @@ export default function Page() {
                       Grid size
                     </p>
                     <div className="flex justify-center my-20 gap-3">
-                      <div className="w-1/2 flex flex-col items-center bg-gray-300 py-32 px-4 rounded-2xl">
-                        <p className="text-5xl font-bold mb-5">Width</p>
+                      <div className="w-1/2 flex flex-col items-center bg-gray-300 my-auto py-16 px-4 rounded-2xl">
+                        <p className="text-2xl 2xl:text-5xl font-bold mb-5">Width</p>
                         <Input
+
                           type="number"
                           className="w-full text-center text-3xl border border-gray-300 rounded-md"
                           placeholder="3"
@@ -624,10 +749,11 @@ export default function Page() {
                         />
                       </div>
                       <p className="flex my-auto text-3xl font-black">x</p>
-                      <div className="w-1/2 flex flex-col items-center bg-gray-300 py-32 px-4 rounded-2xl">
-                        <p className="text-5xl font-bold mb-5">Height</p>
+                      <div className="w-1/2 flex flex-col items-center bg-gray-300 my-auto py-16 px-4 rounded-2xl">
+                        <p className="text-2xl 2xl:text-5xl font-bold mb-5">Height</p>
 
                         <Input
+
                           type="number"
                           className="w-full text-center text-3xl border border-gray-300 rounded-md"
                           placeholder="3"
@@ -644,12 +770,17 @@ export default function Page() {
                     </div>
                   </TabsContent>
                 </Tabs>
-                <Button
-                  onClick={handleSubmit}
-                  className="absolute bottom-5 mx-auto flex  w-[90%] mt-10"
-                >
-                  Submit
-                </Button>
+                <div className="absolute bottom-5 mx-auto  w-[90%] mt-10 ">
+                <p className="text-red-500 text-center mb-3">{error}</p>
+
+<Button
+  onClick={handleSubmit}
+  className="w-full  "
+>
+  Submit
+</Button>
+                </div>
+               
               </div>
               <div className="w-full lg:w-[67%]  flex flex-col mr-10">
                 <div>
@@ -661,6 +792,7 @@ export default function Page() {
                       setThumbnail(image);
                     }}
                     onFullscreen={requestFullscreen}
+                    onDraftSeed={requestDraftSeed}
                     onScreenshot={requestScreenshot}
                     onHideUI={requestHideUI}
                     onGridSize={`Instantiate:${width},${height}`}
