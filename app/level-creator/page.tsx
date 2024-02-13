@@ -626,7 +626,6 @@ export default function Page() {
                 <h2 className="text-2xl text-center font-bold mb-4">
                   Създай ниво
                 </h2>
-                <Button onClick={()=>{console.log(newLevel)}}>TEST</Button>
                 <Tabs defaultValue="details">
                   <TabsList className="flex mx-auto w-full">
                     <TabsTrigger value="details">Details</TabsTrigger>
