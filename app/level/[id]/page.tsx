@@ -82,7 +82,7 @@ export default function Page({ params }: { params: { id: string } }) {
   }, [gameStatus, user]);
 
   useEffect(() => {
-    const fetchProductData = async () => {
+    const fetchData = async () => {
       if (slug) {
         const searchQuery = Number(decodeURIComponent(slug));
         const packQuery = collection(db, "packs");
@@ -145,7 +145,7 @@ export default function Page({ params }: { params: { id: string } }) {
       }
     };
 
-    fetchProductData();
+    fetchData();
   }, [slug, user?.uid, level]);
 
   useEffect(() => {
