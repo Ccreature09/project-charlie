@@ -299,8 +299,10 @@ export default function Page({ params }: { params: { id: string } }) {
                       </Badge>
                     )}
                   </div>
+                  {packName && <div className="bg-blue-300 w-1/2 mx-auto rounded-3xl shadow-xl p-2">
+                  <p className="text-center text-white font-bold ">- {packName} -</p>
+                </div> }
 
-                  <p>{gameStatus}</p>
                   <div className="p-5 font-medium ">
                     <ReactQuill
                       readOnly
@@ -327,7 +329,7 @@ export default function Page({ params }: { params: { id: string } }) {
                   </div>
 
                   <div className="flex flex-wrap h-[10%] w-full  justify-center md:justify-between md:mr-5 bg-white bg-opacity-15 p-5 gap-4">
-                    <Link
+                    {packName && previousLevelId && <Link
                       href={`/${
                         previousLevelId == -1 ? "level-packs" : "level"
                       }/${previousLevelId == -1 ? packName : previousLevelId}`}
@@ -351,7 +353,8 @@ export default function Page({ params }: { params: { id: string } }) {
                         </svg>
                         Previous level
                       </Button>
-                    </Link>
+                    </Link>}
+                    
 
                     <Button
                       className={`${
@@ -410,7 +413,7 @@ export default function Page({ params }: { params: { id: string } }) {
                       </svg>
                       Fullscreen
                     </Button>
-                    <Link
+                    {packName && nextLevelId &&  <Link
                       href={`/${nextLevelId == -1 ? "level-packs" : "level"}/${
                         nextLevelId == -1 ? packName : nextLevelId
                       }`}
@@ -434,7 +437,8 @@ export default function Page({ params }: { params: { id: string } }) {
                           <line x1="8" y1="12" x2="16" y2="12"></line>
                         </svg>
                       </Button>
-                    </Link>
+                    </Link>}
+                   
                   </div>
                 </div>
               </div>
@@ -462,8 +466,11 @@ export default function Page({ params }: { params: { id: string } }) {
                     </Badge>
                   )}
                 </div>
+                {packName && <div className="bg-blue-300 w-1/2 mx-auto rounded-3xl shadow-xl p-2">
+                  <p className="text-center text-white font-bold ">- {packName} -</p>
+                </div> }
+                
 
-                <p>{gameStatus}</p>
                 <div className="p-5 font-medium ">
                   <ReactQuill
                     readOnly
@@ -487,7 +494,7 @@ export default function Page({ params }: { params: { id: string } }) {
                 </div>
 
                 <div className="flex flex-wrap h-[10%] w-full  justify-center md:justify-between md:mr-5 bg-white bg-opacity-15 p-5 gap-4">
-                  <Link
+                  {packName && previousLevelId && <Link
                     href={`/${
                       previousLevelId == -1 ? "level-packs" : "level"
                     }/${previousLevelId == -1 ? packName : previousLevelId}`}
@@ -511,7 +518,8 @@ export default function Page({ params }: { params: { id: string } }) {
                       </svg>
                       Previous level
                     </Button>
-                  </Link>
+                  </Link> }
+                  
 
                   <Button
                     className={`${
@@ -570,7 +578,7 @@ export default function Page({ params }: { params: { id: string } }) {
                     </svg>
                     Fullscreen
                   </Button>
-                  <Link
+                  {packName && nextLevelId &&  <Link
                     href={`/${nextLevelId == -1 ? "level-packs" : "level"}/${
                       nextLevelId == -1 ? packName : nextLevelId
                     }`}
@@ -594,7 +602,8 @@ export default function Page({ params }: { params: { id: string } }) {
                         <line x1="8" y1="12" x2="16" y2="12"></line>
                       </svg>
                     </Button>
-                  </Link>
+                  </Link> }
+                 
                 </div>
               </div>
             </>
