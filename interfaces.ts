@@ -23,6 +23,7 @@ export interface User {
   username: string;
   badges: string[];
   levels: number[];
+  draftLevel: Level;
   completedLevels: number[];
   likedLevels: number[];
   dateOfRegistration: Timestamp | FieldValue;
