@@ -102,7 +102,6 @@ export default function Page({ params }: { params: { id: string } }) {
 
   const deleteLevel = async (levelId: number) => {
     try {
-      // Query the levels collection for the document with the specified level ID
       const levelsQuery = query(
         collection(db, "levels"),
         where("id", "==", levelId)
@@ -212,7 +211,6 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
           </div>
         )}
-  <button onClick={()=>{console.log(levels)}}>TEST</button>
         <div className="mx-10 text-4xl text-white font-bold">
           <p className="mt-10 ml-5">My Levels</p>
           {levels.length > 0 ? (
