@@ -20,13 +20,7 @@ import { Level } from "@/interfaces";
 import { db } from "@/firebase/firebase";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-const backgroundImageStyle = {
-  backgroundImage:
-    "url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')",
-  backgroundSize: "cover",
-  minHeight: "100vh",
-  width: "100%",
-};
+
 
 export default function Page() {
   const [newLevels, setNewLevels] = useState<Level[]>([]);
@@ -81,7 +75,7 @@ export default function Page() {
 
   return (
     <>
-      <div style={backgroundImageStyle} className="h-screen ">
+      <div  className="h-screen bg-cover min-h-screen 2xl:min-h-[150vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] ">
         <Navbar></Navbar>
 
         <p className="text-5xl text-white mt-10 font-bold text-center">
