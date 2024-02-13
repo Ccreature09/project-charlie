@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { Timestamp, collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
 import { Button } from "../ui/button";
+import Link from "next/link";
 export default function LevelList() {
   const router = useRouter();
   const [levels, setLevels] = useState<Level[]>([]);
@@ -48,25 +49,16 @@ export default function LevelList() {
     fetchLevels();
   }, []); // Empty dependency array ensures the effect runs once when the component mounts
 
-  const handleVisitLevel = (levelId: number) => {
-    router.push(`/level/${levelId}`);
-  };
 
-  const handleWarnLevel = (levelId: number) => {
-    // Implement your custom warning logic here
-    alert(`Warning: This is a custom warning for level ${levelId}`);
-  };
+ 
 
   const handleDeleteLevel = (levelId: number) => {
     // Implement your delete level logic here
     alert(`Deleting level ${levelId}`);
-    // You may want to trigger an API call or state update to delete the level
   };
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentLevels = levels.slice(indexOfFirstItem, indexOfLastItem);
-
   return (
     <>
       {mount && (
@@ -106,9 +98,9 @@ export default function LevelList() {
                   {/* Image column */}
                   <TableCell>
                     <img
-                      src={`https://example.com/${level.imgURL}`}
+                      src={`${level.imgURL}`}
                       alt="Level Image"
-                      className="w-8 h-8"
+                      className="w-1/2 flex mx-auto"
                     />
                   </TableCell>
                   <TableCell>{level.name}</TableCell>
@@ -127,13 +119,12 @@ export default function LevelList() {
                   <TableCell>
                     {/* Actions column */}
                     {/* Visit Level Button */}
-                    <Button onClick={() => handleVisitLevel(level.id)}>
-                      Visit Level
-                    </Button>
-                    {/* Warn Level Button */}
-                    <Button onClick={() => handleWarnLevel(level.id)}>
-                      Warn User
-                    </Button>
+                   
+                    <Link
+                    href={`/level/${level.id}`}
+                    > <Button >
+                    Visit Level
+                  </Button></Link>
                     {/* Delete Level Button */}
                     <Button onClick={() => handleDeleteLevel(level.id)}>
                       Delete Level
