@@ -8,25 +8,15 @@ import { User } from "firebase/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LevelList from "@/components/functional/level-list";
 import UserList from "@/components/functional/user-list";
-const backgroundImageStyle = {
-  backgroundImage:
-    "url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')",
-  backgroundSize: "cover",
-  width: "100%",
-};
+
 export default function Page() {
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
-  undefined;
   const adminArray = ["qAYbbta2AgRfev9NTEbMUqL1r212"];
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user && adminArray.includes(user.uid)) {
-        setIsAdmin(true);
       } else {
-        setIsAdmin(false);
         router.push("/");
       }
     });
@@ -35,13 +25,12 @@ export default function Page() {
 
   return (
     <>
-      <div style={backgroundImageStyle} className="h-screen bg-cover min-h-screen 2xl:min-h-[130vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] ">
+      <div className="h-screen bg-cover min-h-screen 2xl:min-h-[130vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] ">
         <Navbar />
         <div className="container mx-auto p-4 flex flex-col">
           <Tabs defaultValue="levels" className="w-full mx-auto">
             <TabsList className="w-full mb-5 flex flex-row">
               <TabsTrigger value="levels">Levels</TabsTrigger>
-              <TabsTrigger value="level-packs">Level Packs</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
             </TabsList>
             <div className="w-full flex flex-row">
@@ -51,7 +40,6 @@ export default function Page() {
                     <LevelList></LevelList>
                   </div>
                 </TabsContent>
-                <TabsContent value="level-packs"></TabsContent>
                 <TabsContent value="users">
                   <div className="flex ">
                     <div className="flex mx-auto">
