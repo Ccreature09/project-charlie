@@ -60,33 +60,35 @@ export default function UserList() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentUsers = users.slice(indexOfFirstItem, indexOfLastItem);
 
+  // Calculate total pages
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+
   return (
     <>
       {mount && (
-        <div >
-          <Table >
+        <div>
+          <Table className="mb-5" >
             <TableHeader>
               <TableRow>
                 <TableHead className="text-center text-white">
-                  User UID
+                  Потребителски UID
                 </TableHead>
                 <TableHead className="text-center text-white">
-                  User PFP
+                  Профилна Снимка
                 </TableHead>
                 <TableHead className="text-center text-white">
-                  Username
+                  Потребителско Име
                 </TableHead>
                 <TableHead className="text-center text-white">
-                  Register Data
+                  Дата на Регистрация
                 </TableHead>
 
                 <TableHead className="text-center text-white">
-                  Actions
+                  Действия
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="text-white">
-              {" "}
               {currentUsers.map((user) => (
                 <TableRow key={user.uid}>
                   <TableCell>{user.uid}</TableCell>
@@ -116,55 +118,26 @@ export default function UserList() {
               ))}
             </TableBody>
           </Table>
-          <Pagination>
-            <PaginationContent>
+          <Pagination >
+            <PaginationContent className="cursor-pointer">
               <PaginationItem>
-                <PaginationPrevious
-                  onClick={() =>
-                    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
-                  }
-                  //   disabled={currentPage === 1}
-                />
+              <PaginationPrevious  className={`${currentPage === 1 && 'hidden'}`} onClick={() => setCurrentPage(currentPage - 1)} />
+
               </PaginationItem>
+              {/* Generate pagination links dynamically */}
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(index + 1)}
+                    isActive={index + 1 === currentPage}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
               <PaginationItem>
-                <PaginationLink
-                  onClick={() => setCurrentPage(1)}
-                  isActive={currentPage === 1}
-                >
-                  1
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink
-                  onClick={() => setCurrentPage(2)}
-                  isActive={currentPage === 2}
-                >
-                  2
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink
-                  onClick={() => setCurrentPage(3)}
-                  isActive={currentPage === 3}
-                >
-                  3
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() =>
-                    setCurrentPage((prevPage) =>
-                      Math.min(
-                        prevPage + 1,
-                        Math.ceil(users.length / itemsPerPage)
-                      )
-                    )
-                  }
-                  //   disabled={
-                  //    currentusers.length < itemsPerPage ||
-                  //    currentPage === Math.ceil(users.length / itemsPerPage)
-                  //  }
-                />
+        <PaginationNext  className={`${currentPage === totalPages && 'hidden'}`} onClick={() => setCurrentPage(currentPage + 1)} />
+
               </PaginationItem>
             </PaginationContent>
           </Pagination>
