@@ -1,21 +1,14 @@
 "use client";
+import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/functional/navbar";
 import { User as UserData, Level } from "@/interfaces";
 import { User } from "firebase/auth";
 import { getDocs, where, query, collection } from "firebase/firestore";
 import { db, auth } from "@/firebase/firebase";
-import React, { useState, useEffect } from "react";
-const backgroundImageStyle = {
-  backgroundImage:
-    "url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')",
-  backgroundSize: "cover",
-  width: "100%",
-};
 
 const stripHtmlTags = (html: string): string => {
-  return html.replace(/<[^>]*>?/gm, '');
+  return html.replace(/<[^>]*>?/gm, "");
 };
-
 
 export default function Page({ params }: { params: { pack: string } }) {
   const [levels, setLevels] = useState<Level[]>([]);
@@ -96,7 +89,7 @@ export default function Page({ params }: { params: { pack: string } }) {
     setProgress(calculatedProgress);
   }, [userData, levels]);
   return (
-    <div style={backgroundImageStyle} className="h-screen flex-row">
+    <div className="h-screen flex-row bg-cover min-h-screen bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')]">
       <Navbar></Navbar>
 
       <div className=" bg-white bg-opacity-5 hover:bg-opacity-10 mx-10 mt-10 shadow-xl text-white p-8">
@@ -104,7 +97,9 @@ export default function Page({ params }: { params: { pack: string } }) {
           <div className="flex items-center space-x-4">
             <SettingsIcon className="text-white h-12 w-12" />
             <div>
-              <h1 className="text-3xl font-bold">{params.pack} pack</h1>
+              <h1 className="text-3xl font-bold">
+                {decodeURIComponent(params.pack)}
+              </h1>
               <p className="text-gray-400">{description}</p>
             </div>
           </div>
@@ -119,43 +114,59 @@ export default function Page({ params }: { params: { pack: string } }) {
             />
             <p className="text-xl font-semibold">{progress}% </p>
           </div>
-          <div className="space-y-4 max-h-[400px] overflow-auto">
-            {levels &&
-              levels.map((level) => (
-                <Link href={`/level/${level.id}`} key={level.id}>
-                  <div className="flex items-center hover:bg-white hover:bg-opacity-10 px-6 py-3 rounded-xl justify-between mr-5">
-                    <div className="flex items-center space-x-3">
-                      <div>
-                      {userData?.completedLevels.includes(level.id) ? (
-                        <CheckCircleIcon className="text-green-500 h-6 w-6" />
-                      ) : (
-                        <CircleIcon className="text-green-500 h-6 w-6" />
-                      )}
+          {levels.length > 1 ? (
+            <div className="space-y-4 max-h-[400px] overflow-auto">
+              {levels &&
+                levels.map((level) => (
+                  <Link href={`/level/${level.id}`} key={level.id}>
+                    <div className="flex items-center hover:bg-white hover:bg-opacity-10 px-6 py-3 rounded-xl justify-between mr-5">
+                      <div className="flex items-center space-x-3">
+                        <div>
+                          {userData?.completedLevels.includes(level.id) ? (
+                            <CheckCircleIcon className="text-green-500 h-6 w-6" />
+                          ) : (
+                            <CircleIcon className="text-green-500 h-6 w-6" />
+                          )}
+                        </div>
+
+                        <div>
+                          <h3 className="font-semibold">{level.name}</h3>
+                          <p className="text-gray-400 text-sm">
+                            {stripHtmlTags(level.description)}
+                          </p>
+                        </div>
                       </div>
-                      
-                      <div>
-                        <h3 className="font-semibold">{level.name}</h3>
-                        <p className="text-gray-400 text-sm">
-                          {stripHtmlTags(level.description)}
-                        </p>
-                      </div>
+                      <Badge variant="secondary" className="mx-2">
+                        {level.difficulty}
+                      </Badge>
                     </div>
-                    <Badge variant="secondary" className="mx-2">{level.difficulty}</Badge>
+                  </Link>
+                ))}
+            </div>
+          ) : (
+            <div className="space-y-4 max-h-[400px] overflow-auto">
+              {[...Array(6)].map((_, index) => (
+                <div className="flex" key={index}>
+                  <CircleIcon className="text-green-500 h-6 w-6" />
+                  <div>
+                    <Skeleton className="w-[150px] my-3 h-[10px] mx-10" />
+                    <Skeleton className="w-[650px] h-[25px] mx-10" />
                   </div>
-                </Link>
+                </div>
               ))}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function CheckCircleIcon(props: any) {
   return (
