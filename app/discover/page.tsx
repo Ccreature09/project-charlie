@@ -20,7 +20,7 @@ import { Level } from "@/interfaces";
 import { db } from "@/firebase/firebase";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Page() {
   const [newLevels, setNewLevels] = useState<Level[]>([]);
@@ -75,60 +75,74 @@ export default function Page() {
 
   return (
     <>
-      <div  className="h-screen bg-cover min-h-screen 2xl:min-h-[150vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] ">
+      <div className="h-screen bg-cover min-h-[125vh] 2xl:min-h-[150vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] ">
         <Navbar></Navbar>
 
-        <p className="text-5xl text-white mt-10 font-bold text-center">
+        <p className="text-5xl text-white mt-10 font-bold text-center select-none pointer-events-none">
           Открий Нива!
         </p>
 
         <div>
           {/* First Carousel */}
           <div className="my-10">
-            <p className="ml-24 my-5 text-white text-3xl font-semibold">
+            <p className="ml-24 my-5 text-white text-3xl font-semibold select-none pointer-events-none">
               Най-нови нива
             </p>
             <Carousel className=" mx-20">
-              <CarouselContent>
-                {newLevels.map((level, index) => (
-                  <CarouselItem
-                    key={index}
-                    className=" md:basis-1/2 lg:basis-1/3"
-                  >
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>{level.name}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <img src={level.imgURL} className="" alt="" />
-                      </CardContent>
-                      <CardFooter>
-                        <Link href={`/level/${level.id}`}>
-                          <Button>Play</Button>
-                        </Link>
-                        <div className="flex mx-4 gap-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            className="my-auto"
-                          >
-                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-                          </svg>
+              {newLevels.length > 1 ? (
+                <CarouselContent>
+                  {newLevels.map((level, index) => (
+                    <CarouselItem
+                      key={index}
+                      className=" md:basis-1/2 lg:basis-1/3"
+                    >
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>{level.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <img src={level.imgURL} className="" alt="" />
+                        </CardContent>
+                        <CardFooter>
+                          <Link href={`/level/${level.id}`}>
+                            <Button>Play</Button>
+                          </Link>
+                          <div className="flex mx-4 gap-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              className="my-auto"
+                            >
+                              <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                            </svg>
 
-                          <p className="text-xl">{level.likes}</p>
-                        </div>
-                      </CardFooter>
-                    </Card>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
+                            <p className="text-xl">{level.likes}</p>
+                          </div>
+                        </CardFooter>
+                      </Card>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              ) : (
+                <CarouselContent>
+                  {[...Array(6)].map((_, index) => (
+                    <CarouselItem
+                      key={index}
+                      className="md:basis-1/2 lg:basis-1/3"
+                    >
+                      <Skeleton className="w-full h-[400px]" />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              )}
+
               <CarouselPrevious />
               <CarouselNext />
             </Carousel>
@@ -136,50 +150,64 @@ export default function Page() {
 
           {/* Second Carousel */}
           <div className="my-10 ">
-            <p className="ml-24 my-5 text-white text-3xl font-semibold">
+            <p className="ml-24 my-5 text-white text-3xl font-semibold select-none pointer-events-none">
               Най-харесвани нива
             </p>
-            <Carousel className="mx-20">
-              <CarouselContent>
-                {likedLevels.map((level, index) => (
-                  <CarouselItem
-                    key={index}
-                    className=" md:basis-1/2 lg:basis-1/3"
-                  >
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>{level.name}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <img src={level.imgURL} alt="" />
-                      </CardContent>
-                      <CardFooter>
-                        <Link href={`/level/${level.id}`}>
-                          <Button>Play</Button>
-                        </Link>
-                        <div className="flex mx-4 gap-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            className="my-auto"
-                          >
-                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-                          </svg>
+            <Carousel className=" mx-20">
+              {likedLevels.length > 1 ? (
+                <CarouselContent>
+                  {likedLevels.map((level, index) => (
+                    <CarouselItem
+                      key={index}
+                      className=" md:basis-1/2 lg:basis-1/3"
+                    >
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>{level.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <img src={level.imgURL} className="" alt="" />
+                        </CardContent>
+                        <CardFooter>
+                          <Link href={`/level/${level.id}`}>
+                            <Button>Play</Button>
+                          </Link>
+                          <div className="flex mx-4 gap-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              className="my-auto"
+                            >
+                              <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                            </svg>
 
-                          <p className="text-xl">{level.likes}</p>
-                        </div>
-                      </CardFooter>
-                    </Card>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
+                            <p className="text-xl">{level.likes}</p>
+                          </div>
+                        </CardFooter>
+                      </Card>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              ) : (
+                <CarouselContent>
+                  {[...Array(6)].map((_, index) => (
+                    <CarouselItem
+                      key={index}
+                      className="md:basis-1/2 lg:basis-1/3"
+                    >
+                      <Skeleton className="w-full h-[400px]" />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              )}
+
               <CarouselPrevious />
               <CarouselNext />
             </Carousel>
