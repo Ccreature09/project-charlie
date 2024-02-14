@@ -56,14 +56,19 @@ export default function LevelList() {
     // Implement your delete level logic here
     alert(`Deleting level ${levelId}`);
   };
+  
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentLevels = levels.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Calculate total pages
+  const totalPages = Math.ceil(levels.length / itemsPerPage);
+
   return (
     <>
       {mount && (
-        <div className="flex flex-col ">
-          <Table className="w-full">
+        <div>
+          <Table className="mb-5" >
             <TableHeader className="w-full">
               <TableRow className="w-full mx-auto">
                 <TableHead className="text-center text-white">
@@ -78,9 +83,7 @@ export default function LevelList() {
                 <TableHead className="text-center text-white">
                   Grid Size
                 </TableHead>
-                <TableHead className="text-center text-white">
-                  Unlimited
-                </TableHead>
+               
                 <TableHead className="text-center text-white">Author</TableHead>
                 <TableHead className="text-center text-white">
                   Publish Date
@@ -107,7 +110,6 @@ export default function LevelList() {
                   <TableCell>{level.tags.join(", ")}</TableCell>
                   <TableCell>{level.difficulty}</TableCell>
                   <TableCell>{level.grid}</TableCell>
-                  <TableCell>{level.unlimited ? "true" : "false"}</TableCell>
                   <TableCell>{level.author}</TableCell>
                   <TableCell>
                     <TableCell>
@@ -134,56 +136,26 @@ export default function LevelList() {
               ))}
             </TableBody>
           </Table>
-          <Pagination>
-            <PaginationContent>
+          <Pagination className="" >
+            <PaginationContent className="cursor-pointer">
               <PaginationItem>
-                <PaginationPrevious
-                  onClick={() =>
-                    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
-                  }
-                  //   disabled={currentPage === 1}
-                />
+              <PaginationPrevious  className={`${currentPage === 1 && 'hidden'}`} onClick={() => setCurrentPage(currentPage - 1)} />
+
               </PaginationItem>
+              {/* Generate pagination links dynamically */}
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(index + 1)}
+                    isActive={index + 1 === currentPage}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
               <PaginationItem>
-                <PaginationLink
-                  onClick={() => setCurrentPage(1)}
-                  isActive={currentPage === 1}
-                >
-                  1
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink
-                  onClick={() => setCurrentPage(2)}
-                  isActive={currentPage === 2}
-                >
-                  2
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink
-                  onClick={() => setCurrentPage(3)}
-                  isActive={currentPage === 3}
-                >
-                  3
-                </PaginationLink>
-              </PaginationItem>
-              {/* ... other pages ... */}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() =>
-                    setCurrentPage((prevPage) =>
-                      Math.min(
-                        prevPage + 1,
-                        Math.ceil(levels.length / itemsPerPage)
-                      )
-                    )
-                  }
-                  //   disabled={
-                  //    currentLevels.length < itemsPerPage ||
-                  //    currentPage === Math.ceil(levels.length / itemsPerPage)
-                  //  }
-                />
+        <PaginationNext  className={`${currentPage === totalPages && 'hidden'}`} onClick={() => setCurrentPage(currentPage + 1)} />
+
               </PaginationItem>
             </PaginationContent>
           </Pagination>
