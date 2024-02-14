@@ -1,6 +1,12 @@
 "use client";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { User as UserData, Level } from "@/interfaces";
+import Link from "next/link";
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import { db, auth } from "@/firebase/firebase";
+import { User, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import {
   addDoc,
   collection,
@@ -12,7 +18,7 @@ import {
   where,
   setDoc,
   updateDoc,
-  deleteField
+  DocumentReference,
 } from "firebase/firestore";
 import {
   AlertDialog,
@@ -27,21 +33,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import React, { useEffect, useState } from "react";
-import { User as UserData, Level } from "@/interfaces";
-import { Navbar } from "@/components/functional/navbar";
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
-const backgroundImageStyle = {
-  backgroundImage:
-    "url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')",
-  backgroundSize: "cover",
-  width: "100%",
-};
-import { User, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import UnityLevelEmbed from "@/components/functional/unity-levelcreator";
 import "react-quill/dist/quill.snow.css";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -49,25 +46,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { onAuthStateChanged } from "firebase/auth";
+import UnityLevelEmbed from "@/components/functional/unity-levelcreator";
+import { Navbar } from "@/components/functional/navbar";
 import UserForm from "@/components/functional/signIn";
-import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
+
 const provider = new GoogleAuthProvider();
 const toolbarOptions = [
-  ["bold", "italic", "underline"], // toggled buttons
+  ["bold", "italic", "underline"],
   ["blockquote", "code-block"],
   [{ list: "ordered" }, { list: "bullet" }],
-  [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
+  [{ indent: "-1" }, { indent: "+1" }],
 
-  [{ size: ["small", false, "large", "huge"] }], // custom dropdown
+  [{ size: ["small", false, "large", "huge"] }],
 
-  [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+  [{ color: [] }, { background: [] }],
   [{ align: [] }],
 
-  ["clean"], // remove formatting button
+  ["clean"],
 ];
 
 export default function Page() {
@@ -85,7 +81,6 @@ export default function Page() {
     name: "",
     description: "",
     difficulty: "",
-    unlimited: false,
   };
 
   const [newLevel, setNewLevel] = useState(initialLevelState);
@@ -98,6 +93,7 @@ export default function Page() {
   const levelsCollectionRef = collection(db, "levels");
   const [signInPopup, setsignInPopup] = useState(false);
   const [seed, setSeed] = useState("");
+  const [finalSeed, setFinalSeed] = useState("");
   const [requestFullscreen, setRequestFullscreen] = useState(false);
   const [requestDraftSeed, setRequestDraftSeed] = useState("");
   const [requestScreenshot, setRequestScreenshot] = useState(false);
@@ -111,7 +107,6 @@ export default function Page() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Check if the user already exists in the "users" collection
       const userDocRef = doc(db, "users", user.uid);
       const querySnapshot = await query(
         collection(db, "users"),
@@ -120,7 +115,6 @@ export default function Page() {
       const queryData = await getDocs(querySnapshot);
 
       if (queryData.empty) {
-        // User does not exist, create a new user document
         const userData = {
           uid: user.uid,
           pfp: user.photoURL,
@@ -130,12 +124,10 @@ export default function Page() {
           levels: [],
         };
 
-        // Add the new user document to the "users" collection
         await setDoc(userDocRef, userData);
       } else {
       }
 
-      // Set the user state
       setUser(user);
     } catch (error) {
       console.error("Google sign-in failed:", error);
@@ -146,36 +138,41 @@ export default function Page() {
     const fetchData = async () => {
       const snapshot = await getDocs(levelsCollectionRef);
       setLevelCount(snapshot.size);
-  
+
       if (user?.uid) {
         const userQuery = query(
           collection(db, "users"),
           where("uid", "==", user?.uid)
         );
         const userSnapshot = await getDocs(userQuery);
-        console.log("SNAPSHOT: "+!userSnapshot.empty);
         if (!userSnapshot.empty) {
           const userData = userSnapshot.docs[0].data() as UserData;
           setUserData(userData);
-          console.log("SNAPSHOT USERDATA: "+userData)
           if (userData.draftLevel) {
-            console.log("SETTING NEWLEVEL TO DRAFTLEVEL")
             setNewLevel(userData.draftLevel);
-            console.log("REQUESTING: "+ userData.draftLevel.seed)
-            setRequestDraftSeed(userData.draftLevel.seed)
+
+            if (userData.draftLevel.grid != "") {
+              const [width, height] = userData.draftLevel.grid.split("x");
+              setWidth(Number(width));
+              setHeight(Number(height));
+            } else {
+              setWidth(3);
+              setHeight(3);
+            }
+
+            setRequestDraftSeed(userData.draftLevel.seed);
           }
         }
       }
     };
-  
+
     const unsubscribeSnapshot = updateLevelCountOnSnapshot();
     fetchData();
-  
+
     return () => {
       unsubscribeSnapshot();
     };
   }, [user?.uid]);
-  
 
   const updateLevelCountOnSnapshot = () => {
     const unsubscribe = onSnapshot(levelsCollectionRef, (snapshot) => {
@@ -184,82 +181,61 @@ export default function Page() {
 
     return unsubscribe;
   };
-    useEffect(() => {
-      if (seed) {
-        setNewLevel({...newLevel, seed: seed})
-        if (newLevel.seed == seed) {
-       saveDraftLevelToFirestore("seed update");
-        }
+  useEffect(() => {
+    if (seed) {
+      const [finalSeed, draftSeed] = seed.split("~");
+      setFinalSeed(finalSeed);
+      setNewLevel((prevNewLevel) => ({
+        ...prevNewLevel,
+        seed: draftSeed,
+        grid: `${width}x${height}`,
+      }));
+      if (newLevel.seed == draftSeed) {
+        saveDraftLevelToFirestore();
       }
-     
-      
-    }, [newLevel.seed, seed])
+    }
+  }, [seed, newLevel.seed]);
 
-    useEffect(() => {
-      thumbnail && setNewLevel({...newLevel, imgURL: thumbnail})
-     saveDraftLevelToFirestore("thumbnail");
-    }, [thumbnail, newLevel.imgURL])
-    
+  useEffect(() => {
+    thumbnail && setNewLevel({ ...newLevel, imgURL: thumbnail });
+    saveDraftLevelToFirestore();
+  }, [thumbnail, newLevel.imgURL]);
 
-    const handleSubmit = async () => {
-      try {
-        if (newLevel.name && newLevel.seed && newLevel.imgURL && newLevel.difficulty) {
-          console.log("Adding level...");
-    
-          await addDoc(levelsCollectionRef, {
-            ...newLevel,
-            seed: seed,
-            likes: 0,
-            grid: `${width}x${height}`,
-            id: levelCount,
-            author: user?.displayName,
-            authorUID: user?.uid,
-            pfp: user?.photoURL,
-            publishDate: serverTimestamp(),
-          });
-    
-          const userQuery = query(
-            collection(db, "users"),
-            where("uid", "==", user?.uid)
-          );
-    
-          const userQuerySnapshot = await getDocs(userQuery);
-    
-          if (!userQuerySnapshot.empty) {
-            const userDoc = userQuerySnapshot.docs[0];
-            const userData = userDoc.data();
-    
-            // Ensure userData.levels is always an array
-            const updatedLevels = Array.isArray(userData.levels) ? [...userData.levels, levelCount] : [levelCount];
+  const handleSubmit = async () => {
+    try {
+      if (
+        newLevel.name &&
+        newLevel.seed &&
+        newLevel.imgURL &&
+        newLevel.difficulty
+      ) {
+        setNewLevel({ ...newLevel, seed: finalSeed });
+        const newLevelData = {
+          ...newLevel,
+          seed: seed,
+          likes: 0,
+          grid: `${width}x${height}`,
+          id: levelCount,
+          author: user?.displayName,
+          authorUID: user?.uid,
+          pfp: user?.photoURL,
+          publishDate: serverTimestamp(),
+        };
+        await addDoc(levelsCollectionRef, newLevelData);
 
-            setError("");
-            setThumbnail("");
-            setWidth(3);
-            setHeight(3);
-            setSeed("");
-            setNewLevel(initialLevelState);
-
-
-            console.log("Deleting draft...");
-            await setDoc(userDoc.ref, { 
-              levels: updatedLevels, 
-            }, { merge: true });
-
-            await updateDoc(userDoc.ref, {
-              draftLevel: deleteField()
-          }, );
-          }
-          
-        } else {
-          console.log("Invalid Data");
-          setError("Invalid Data");
-        }
-      } catch (error) {
-        console.error("Error creating level:", error);
+        setError("");
+        setThumbnail("");
+        setWidth(3);
+        setHeight(3);
+        setSeed("");
+        setNewLevel(initialLevelState);
+      } else {
+        setError("Invalid Data");
       }
-    };
-    
-  
+    } catch (error) {
+      console.error("Error creating level:", error);
+    }
+  };
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -282,25 +258,20 @@ export default function Page() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  
-  const saveDraftLevelToFirestore = async (from: string) => {
-    console.log("SAVING DATE TO FB from " + from)
-    console.log(newLevel);
+  const saveDraftLevelToFirestore = async () => {
     try {
       if (user?.uid) {
         const userQuery = query(
           collection(db, "users"),
           where("uid", "==", user.uid)
         );
-        
+
         const querySnapshot = await getDocs(userQuery);
-        
+
         if (!querySnapshot.empty) {
           const userDoc = querySnapshot.docs[0];
           const userDocRef = doc(db, "users", userDoc.id);
-          console.log("SUBMITING "+ newLevel.seed)
           await setDoc(userDocRef, { draftLevel: newLevel }, { merge: true });
-
         }
       }
     } catch (error) {
@@ -308,32 +279,61 @@ export default function Page() {
     }
   };
 
+  const resetDraftLevel = async () => {
+    try {
+      const userQuerySnapshot = await getDocs(collection(db, "users"));
+
+      let currentUserDocumentRef: DocumentReference | undefined;
+      let userData: UserData | undefined;
+
+      userQuerySnapshot.forEach((doc) => {
+        const userDataFromDoc = doc.data() as UserData;
+        if (userDataFromDoc.uid === user?.uid) {
+          currentUserDocumentRef = doc.ref;
+          userData = userDataFromDoc;
+        }
+      });
+
+      if (currentUserDocumentRef && userData) {
+        const updatedLevels = [...(userData.levels || []), levelCount];
+
+        await updateDoc(currentUserDocumentRef, {
+          draftLevel: null,
+          levels: updatedLevels,
+        });
+      }
+
+      setError("");
+      setThumbnail("");
+      setWidth(3);
+      setHeight(3);
+      setSeed("");
+      setNewLevel(initialLevelState);
+    } catch (error) {
+      console.error("Error resetting draft level:", error);
+    }
+  };
+
   return (
     <>
-      <div style={backgroundImageStyle} className="h-screen flex-row bg-cover">
+      <div className="h-screen flex-row bg-cover min-h-[150vh] lg:min-h-screen xl:min-h-screen 2xl:min-h-[110vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')]">
         <Navbar></Navbar>
-        <div
-          style={backgroundImageStyle}
-          className=" flex flex-col mt-5 lg:flex-row"
-        >
+        <div className=" flex flex-col mt-5 lg:flex-row">
           <AlertDialog open={signInPopup}>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Регистрирайте се за да създавате нива!
-                </AlertDialogTitle>
+                <AlertDialogTitle>Регистрирайте се!</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your account and remove your data from our servers.
+                  Моля регистрирайте се за да създавате нива.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <Link href={"/"}>
-                  <Button>Back</Button>
+                  <Button>Назад</Button>
                 </Link>
                 <Popover>
                   <PopoverTrigger>
-                    <Button>Continue</Button>
+                    <Button>Регистриране</Button>
                   </PopoverTrigger>
                   <PopoverContent>
                     <Button
@@ -355,162 +355,157 @@ export default function Page() {
             <>
               <div className="mx-5 mb-5">
                 <div className="w-full h-full flex flex-col text-black p-5  bg-white rounded-lg">
-                <h2 className="text-2xl text-center font-bold mb-4">
-                  Създай ниво
-                </h2>
-                <Tabs defaultValue="details">
-                  <TabsList className="flex mx-auto w-full">
-                    <TabsTrigger value="details">Details</TabsTrigger>
-                    <TabsTrigger value="description">Description</TabsTrigger>
-                    <TabsTrigger value="grid">Grid</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="details">
-                    <div>
-                      <p className=" text-lg mb-2">Name:</p>
-                      <Input
-                      onBlur={()=> saveDraftLevelToFirestore("blur name")}
+                  <h2 className="text-3xl text-center font-bold mb-4">
+                    Създай ниво
+                  </h2>
+                  <Tabs defaultValue="details">
+                    <TabsList className="flex mx-auto w-full">
+                      <TabsTrigger value="details">Детайли</TabsTrigger>
+                      <TabsTrigger value="description">Описание</TabsTrigger>
+                      <TabsTrigger value="grid">Грид</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="details">
+                      <div>
+                        <p className=" text-2xl mb-2">Име:</p>
+                        <Input
+                          onBlur={() => saveDraftLevelToFirestore()}
+                          placeholder="Моето първо ниво!"
+                          type="text"
+                          value={newLevel.name}
+                          onChange={(e) =>
+                            setNewLevel({ ...newLevel, name: e.target.value })
+                          }
+                          className="p-2 rounded mb-4 w-full text-xl text-black"
+                        />
+                      </div>
+                      <div>
+                        <p className=" text-lg mb-2">
+                          Снимка: {!newLevel.imgURL && "няма..."}
+                        </p>
 
-                        type="text"
-                        value={newLevel.name}
-                        onChange={(e) =>
-                          setNewLevel({ ...newLevel, name: e.target.value })
-                        }
-                        className="p-2 rounded mb-4 w-full text-black"
-                      />
-                    </div>
-                    <div>
-                      <p className=" text-lg mb-2">
-                        Thumbnail: {!newLevel.imgURL && "none..."}
-                      </p>
-
-                      <img src={newLevel.imgURL} alt="" />
-                    </div>
-                    <div>
-                      <div className="mt-10">
-                        <div className="flex gap-3">
-                          <div className="w-1/2">
-                            <p className=" mt-5">Difficulty:</p>
-                            <Select
-                              onValueChange={(e) =>
-                                setNewLevel({ ...newLevel, difficulty: e })
-                              }
-                              value={newLevel.difficulty}
-                            >
-                              <SelectTrigger
-                      onBlur={()=> saveDraftLevelToFirestore("blur difficulty")}
-                      >
-                                <SelectValue placeholder="Difficulty" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="easy">Easy</SelectItem>
-                                <SelectItem value="medium">Medium</SelectItem>
-                                <SelectItem value="hard">Hard</SelectItem>
-                                <SelectItem value="insane">Insane</SelectItem>
-                                <SelectItem value="master">Master</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="w-1/2">
-                            <p className=" mt-5">Blocks:</p>
-
-                            <Select
-                            
-                              onValueChange={(e) =>
-                                setNewLevel({
-                                  ...newLevel,
-                                  unlimited: e == "unlimited" ? true : false,
-                                })
-                              }
-                              value={
-                                newLevel.unlimited ? "unlimited" : "limited"
-                              }
-                            >
-                              <SelectTrigger
-                      onBlur={()=> saveDraftLevelToFirestore("blur unlim")}
-
+                        <img src={newLevel.imgURL} alt="" />
+                      </div>
+                      <div>
+                        <div className="mt-10">
+                          <div className="flex gap-3">
+                            <div className="w-full">
+                              <p className=" mt-5 mb-2 text-2xl">Трудност:</p>
+                              <Select
+                                onValueChange={(e) =>
+                                  setNewLevel({ ...newLevel, difficulty: e })
+                                }
+                                value={newLevel.difficulty}
                               >
-                                <SelectValue placeholder="Blocks" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="unlimited">
-                                  Unlimited
-                                </SelectItem>
-                                <SelectItem value="limited">Limited</SelectItem>
-                              </SelectContent>
-                            </Select>
+                                <SelectTrigger
+                                  className="text-xl"
+                                  onBlur={() => saveDraftLevelToFirestore()}
+                                >
+                                  <SelectValue placeholder="Избери трудност" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Лесно">Лесно</SelectItem>
+                                  <SelectItem value="medium">
+                                    Нормално
+                                  </SelectItem>
+                                  <SelectItem value="Трудно">Трудно</SelectItem>
+                                  <SelectItem value="Много Трудно">
+                                    Много Трудно
+                                  </SelectItem>
+                                  <SelectItem value="Най-трудно">
+                                    Най-трудно
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="description">
-                    <p className=" text-lg mb-2">Description:</p>
-                    <ReactQuill
-                      onBlur={()=> saveDraftLevelToFirestore("blur desc")}
+                      <p className="text-red-500">{error}</p>
 
-                      theme="snow"
-                      modules={{ toolbar: toolbarOptions }}
-                      value={newLevel.description}
-                      onChange={(value) =>
-                        setNewLevel({ ...newLevel, description: value })
-                      }
-                      className="overflow-y-auto max-h-[500px] "
-                    />
-                  </TabsContent>
-                  <TabsContent value="grid">
-                    <p className="text-black text-center text-5xl my-5 font-semibold">
-                      Grid size
-                    </p>
-                    <div className="flex justify-center my-20 gap-3">
-                      <div className="w-1/2 flex flex-col items-center my-auto bg-gray-300 py-16 px-4 rounded-2xl">
-                        <p className="text-2xl sm:text-5xl font-bold mb-5">Width</p>
-                        <Input
-
-                          type="number"
-                          className="w-full text-center text-3xl border border-gray-300 rounded-md"
-                          placeholder="3"
-                          value={width}
-                          onChange={(e) =>
-                            setWidth(
-                              Math.min(Math.max(Number(e.target.value), 1), 20)
-                            )
+                      <Button
+                        onClick={() => {
+                          if (
+                            newLevel.name &&
+                            newLevel.seed &&
+                            newLevel.imgURL &&
+                            newLevel.difficulty
+                          ) {
+                            handleSubmit();
+                            resetDraftLevel();
+                          } else {
+                            setError("Invalid Data");
                           }
-                          min={1}
-                          max={20}
-                        />
+                        }}
+                        className=" mx-auto flex w-full mt-10"
+                      >
+                        Публикувай
+                      </Button>
+                    </TabsContent>
+                    <TabsContent value="description">
+                      <p className=" text-2xl mb-2">Описание:</p>
+                      <ReactQuill
+                        onBlur={() => saveDraftLevelToFirestore()}
+                        theme="snow"
+                        modules={{ toolbar: toolbarOptions }}
+                        value={newLevel.description}
+                        onChange={(value) =>
+                          setNewLevel({ ...newLevel, description: value })
+                        }
+                        className="overflow-y-auto max-h-[500px] "
+                      />
+                    </TabsContent>
+                    <TabsContent value="grid">
+                      <p className="text-black text-center text-3xl my-5 font-semibold">
+                        Грид Размер
+                      </p>
+                      <div className="flex justify-center my-20 gap-3">
+                        <div className="w-1/2 flex flex-col items-center my-auto bg-gray-300 py-16 px-4 rounded-2xl">
+                          <p className="text-2xl sm:text-5xl font-bold mb-5">
+                            Ширичина
+                          </p>
+                          <Input
+                            type="number"
+                            className="w-full text-center text-3xl border border-gray-300 rounded-md"
+                            placeholder="3"
+                            value={width}
+                            onChange={(e) =>
+                              setWidth(
+                                Math.min(
+                                  Math.max(Number(e.target.value), 1),
+                                  20
+                                )
+                              )
+                            }
+                            min={1}
+                            max={20}
+                          />
+                        </div>
+                        <p className="flex my-auto text-3xl font-black">x</p>
+                        <div className="w-1/2 flex flex-col items-center bg-gray-300 my-auto py-16 px-4 rounded-2xl">
+                          <p className="text-2xl sm:text-5xl font-bold mb-5">
+                            Височина
+                          </p>
+
+                          <Input
+                            type="number"
+                            className="w-full text-center text-3xl border border-gray-300 rounded-md"
+                            placeholder="3"
+                            value={height}
+                            onChange={(e) =>
+                              setHeight(
+                                Math.min(
+                                  Math.max(Number(e.target.value), 1),
+                                  20
+                                )
+                              )
+                            }
+                            min={1}
+                            max={20}
+                          />
+                        </div>
                       </div>
-                      <p className="flex my-auto text-3xl font-black">x</p>
-                      <div className="w-1/2 flex flex-col items-center bg-gray-300 my-auto py-16 px-4 rounded-2xl">
-                        <p className="text-2xl sm:text-5xl font-bold mb-5">Height</p>
-
-                        <Input
-
-                          type="number"
-                          className="w-full text-center text-3xl border border-gray-300 rounded-md"
-                          placeholder="3"
-                          value={height}
-                          onChange={(e) =>
-                            setHeight(
-                              Math.min(Math.max(Number(e.target.value), 1), 20)
-                            )
-                          }
-                          min={1}
-                          max={20}
-                        />
-                      </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-                <p className="text-red-500">{error}</p>
-
-                <Button
-                  onClick={handleSubmit}
-                  className="absolute bottom-5 mx-auto flex  w-[90%] mt-10"
-                >
-                  Submit
-                </Button>
-                    
-                 
+                    </TabsContent>
+                  </Tabs>
                 </div>
               </div>
               <div className=" mx-5 mb-5">
@@ -554,7 +549,7 @@ export default function Page() {
                         <line x1="21" y1="3" x2="14" y2="10"></line>
                         <line x1="3" y1="21" x2="10" y2="14"></line>
                       </svg>
-                      Fullscreen
+                      Цял екран
                     </Button>
                     <Button
                       onClick={() => {
@@ -584,7 +579,7 @@ export default function Page() {
                         <circle cx="8.5" cy="8.5" r="1.5"></circle>
                         <polyline points="21 15 16 10 5 21"></polyline>
                       </svg>
-                      Hide UI
+                      Скрий UI
                     </Button>
                     <Button
                       onClick={() => {
@@ -614,7 +609,7 @@ export default function Page() {
                         <circle cx="8.5" cy="8.5" r="1.5"></circle>
                         <polyline points="21 15 16 10 5 21"></polyline>
                       </svg>
-                      Screenshot
+                      Снимай
                     </Button>
                   </div>
                 </div>
@@ -628,16 +623,16 @@ export default function Page() {
                 </h2>
                 <Tabs defaultValue="details">
                   <TabsList className="flex mx-auto w-full">
-                    <TabsTrigger value="details">Details</TabsTrigger>
-                    <TabsTrigger value="description">Description</TabsTrigger>
-                    <TabsTrigger value="grid">Grid</TabsTrigger>
+                    <TabsTrigger value="details">Детайли</TabsTrigger>
+                    <TabsTrigger value="description">Описание</TabsTrigger>
+                    <TabsTrigger value="grid">Грид</TabsTrigger>
                   </TabsList>
                   <TabsContent value="details">
                     <div>
-                      <p className=" text-lg mb-2">Name:</p>
+                      <p className=" text-2xl mb-2">Име:</p>
                       <Input
-                      onBlur={()=> saveDraftLevelToFirestore("blur name2")}
-
+                        onBlur={() => saveDraftLevelToFirestore()}
+                        placeholder="Моето първо ниво!"
                         type="text"
                         value={newLevel.name}
                         onChange={(e) =>
@@ -647,17 +642,20 @@ export default function Page() {
                       />
                     </div>
                     <div>
-                      <p className=" text-lg mb-2">
-                        Thumbnail: {!newLevel.imgURL && "none..."}
+                      <p className=" text-2xl mb-2">
+                        Снимка: {!newLevel.imgURL && "няма..."}
                       </p>
-
-                      <img src={newLevel.imgURL} alt="" />
+                      {newLevel.imgURL ? (
+                        <img src={newLevel.imgURL} alt="" />
+                      ) : (
+                        <Skeleton className="w-full h-[225px] " />
+                      )}
                     </div>
                     <div>
                       <div className="mt-10">
                         <div className="flex gap-3">
-                          <div className="w-1/2">
-                            <p className=" mt-5">Difficulty:</p>
+                          <div className="w-full">
+                            <p className=" mt-5 mb-2 text-2xl">Трудност:</p>
                             <Select
                               onValueChange={(e) =>
                                 setNewLevel({ ...newLevel, difficulty: e })
@@ -665,75 +663,71 @@ export default function Page() {
                               value={newLevel.difficulty}
                             >
                               <SelectTrigger
-                      onBlur={()=> saveDraftLevelToFirestore("blur diff 2")}
-                      >
-                                <SelectValue placeholder="Difficulty" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="easy">Easy</SelectItem>
-                                <SelectItem value="medium">Medium</SelectItem>
-                                <SelectItem value="hard">Hard</SelectItem>
-                                <SelectItem value="insane">Insane</SelectItem>
-                                <SelectItem value="master">Master</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="w-1/2">
-                            <p className=" mt-5">Blocks:</p>
-
-                            <Select
-                            
-                              onValueChange={(e) =>
-                                setNewLevel({
-                                  ...newLevel,
-                                  unlimited: e == "unlimited" ? true : false,
-                                })
-                              }
-                              value={
-                                newLevel.unlimited ? "unlimited" : "limited"
-                              }
-                            >
-                              <SelectTrigger
-                      onBlur={()=> saveDraftLevelToFirestore("blurr unl 2")}
-
+                                className="text-xl"
+                                onBlur={() => saveDraftLevelToFirestore()}
                               >
-                                <SelectValue placeholder="Blocks" />
+                                <SelectValue placeholder="Избери трудност" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="unlimited">
-                                  Unlimited
+                                <SelectItem value="Лесно">Лесно</SelectItem>
+                                <SelectItem value="Нормално">
+                                  Нормално
                                 </SelectItem>
-                                <SelectItem value="limited">Limited</SelectItem>
+                                <SelectItem value="Трудно">Трудно</SelectItem>
+                                <SelectItem value="Много трудно">
+                                  Много трудно
+                                </SelectItem>
+                                <SelectItem value="Най-трудно">
+                                  Най-трудно
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
                         </div>
                       </div>
                     </div>
+                    <Button
+                      onClick={() => {
+                        if (
+                          newLevel.name &&
+                          newLevel.seed &&
+                          newLevel.imgURL &&
+                          newLevel.difficulty
+                        ) {
+                          handleSubmit();
+                          resetDraftLevel();
+                        } else {
+                          setError("Invalid Data");
+                        }
+                      }}
+                      className=" mx-auto flex w-full mt-10"
+                    >
+                      Публикувай
+                    </Button>
                   </TabsContent>
                   <TabsContent value="description">
-                    <p className=" text-lg mb-2">Description:</p>
+                    <p className=" text-2xl mb-2">Описание:</p>
                     <ReactQuill
-                      onBlur={()=> saveDraftLevelToFirestore("blur desc 2")}
-
+                      onBlur={() => saveDraftLevelToFirestore()}
                       theme="snow"
                       modules={{ toolbar: toolbarOptions }}
                       value={newLevel.description}
                       onChange={(value) =>
                         setNewLevel({ ...newLevel, description: value })
                       }
-                      className="overflow-y-auto max-h-[500px] "
+                      className="overflow-y-auto max-h-[500px]"
                     />
                   </TabsContent>
                   <TabsContent value="grid">
-                    <p className="text-black text-center text-5xl my-5 font-semibold">
-                      Grid size
+                    <p className="text-black text-center text-3xl my-5 font-semibold">
+                      Грид Размер
                     </p>
                     <div className="flex justify-center my-20 gap-3">
-                      <div className="w-1/2 flex flex-col items-center bg-gray-300 my-auto py-16 px-4 rounded-2xl">
-                        <p className="text-2xl 2xl:text-5xl font-bold mb-5">Width</p>
+                      <div className="w-1/2 flex flex-col items-center bg-gray-300 my-auto py-8 xl:py-16 xl:px-4 px-2 rounded-2xl">
+                        <p className="text-xl 2xl:text-3xl font-bold mb-5">
+                          Ширина
+                        </p>
                         <Input
-
                           type="number"
                           className="w-full text-center text-3xl border border-gray-300 rounded-md"
                           placeholder="3"
@@ -748,11 +742,12 @@ export default function Page() {
                         />
                       </div>
                       <p className="flex my-auto text-3xl font-black">x</p>
-                      <div className="w-1/2 flex flex-col items-center bg-gray-300 my-auto py-16 px-4 rounded-2xl">
-                        <p className="text-2xl 2xl:text-5xl font-bold mb-5">Height</p>
+                      <div className="w-1/2 flex flex-col items-center bg-gray-300 my-auto py-8 xl:py-16 xl:px-4 px-2 rounded-2xl">
+                        <p className="text-xl 2xl:text-3xl font-bold mb-5">
+                          Височина
+                        </p>
 
                         <Input
-
                           type="number"
                           className="w-full text-center text-3xl border border-gray-300 rounded-md"
                           placeholder="3"
@@ -769,17 +764,7 @@ export default function Page() {
                     </div>
                   </TabsContent>
                 </Tabs>
-                <div className="absolute bottom-5 mx-auto  w-[90%] mt-10 ">
-                <p className="text-red-500 text-center mb-3">{error}</p>
-
-<Button
-  onClick={handleSubmit}
-  className="w-full  "
->
-  Submit
-</Button>
-                </div>
-               
+                <p className="text-red-500">{error}</p>
               </div>
               <div className="w-full lg:w-[67%]  flex flex-col mr-10">
                 <div>
@@ -821,7 +806,7 @@ export default function Page() {
                       <line x1="21" y1="3" x2="14" y2="10"></line>
                       <line x1="3" y1="21" x2="10" y2="14"></line>
                     </svg>
-                    Fullscreen
+                    Цял екран
                   </Button>
                   <Button
                     onClick={() => {
@@ -851,7 +836,7 @@ export default function Page() {
                       <circle cx="8.5" cy="8.5" r="1.5"></circle>
                       <polyline points="21 15 16 10 5 21"></polyline>
                     </svg>
-                    Hide UI
+                    Скрий UI
                   </Button>
                   <Button
                     onClick={() => {
@@ -881,7 +866,7 @@ export default function Page() {
                       <circle cx="8.5" cy="8.5" r="1.5"></circle>
                       <polyline points="21 15 16 10 5 21"></polyline>
                     </svg>
-                    Screenshot
+                    Снимай
                   </Button>
                 </div>
               </div>
