@@ -19,13 +19,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { onAuthStateChanged } from "firebase/auth";
 import Link from "next/link";
-const backgroundImageStyle = {
-  backgroundImage:
-    "url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')",
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-  width: "100%",
-};
 
 export default function Page({ params }: { params: { id: string } }) {
   const [slug, setSlug] = useState(params.id);
@@ -269,12 +262,9 @@ export default function Page({ params }: { params: { id: string } }) {
 
   return (
     <>
-      <div style={backgroundImageStyle} className="h-screen flex-row bg-cover">
+      <div className="h-screen flex-row bg-cover min-h-[200vh] md:min-h-[150vh] lg:min-h-screen xl:min-h-screen 2xl:min-h-[110vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')]">
         <Navbar></Navbar>
-        <div
-          style={backgroundImageStyle}
-          className="flex flex-col mt-5 lg:flex-row"
-        >
+        <div className="flex flex-col mt-5 lg:flex-row">
           {isSmallScreen ? (
             <>
               <div className="mx-5 mb-5">
@@ -299,9 +289,13 @@ export default function Page({ params }: { params: { id: string } }) {
                       </Badge>
                     )}
                   </div>
-                  {packName && <div className="bg-blue-300 w-1/2 mx-auto rounded-3xl shadow-xl p-2">
-                  <p className="text-center text-white font-bold ">- {packName} -</p>
-                </div> }
+                  {packName && (
+                    <div className="bg-blue-300 w-1/2 mx-auto rounded-3xl shadow-xl p-2">
+                      <p className="text-center text-white font-bold ">
+                        - {packName} -
+                      </p>
+                    </div>
+                  )}
 
                   <div className="p-5 font-medium ">
                     <ReactQuill
@@ -329,32 +323,35 @@ export default function Page({ params }: { params: { id: string } }) {
                   </div>
 
                   <div className="flex flex-wrap h-[10%] w-full  justify-center md:justify-between md:mr-5 bg-white bg-opacity-15 p-5 gap-4">
-                    {packName && previousLevelId && <Link
-                      href={`/${
-                        previousLevelId == -1 ? "level-packs" : "level"
-                      }/${previousLevelId == -1 ? packName : previousLevelId}`}
-                    >
-                      <Button>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="mr-3"
-                        >
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <polyline points="12 8 8 12 12 16"></polyline>
-                          <line x1="16" y1="12" x2="8" y2="12"></line>
-                        </svg>
-                        Previous level
-                      </Button>
-                    </Link>}
-                    
+                    {packName && previousLevelId && (
+                      <Link
+                        href={`/${
+                          previousLevelId == -1 ? "level-packs" : "level"
+                        }/${
+                          previousLevelId == -1 ? packName : previousLevelId
+                        }`}
+                      >
+                        <Button>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="mr-3"
+                          >
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 8 8 12 12 16"></polyline>
+                            <line x1="16" y1="12" x2="8" y2="12"></line>
+                          </svg>
+                          Previous level
+                        </Button>
+                      </Link>
+                    )}
 
                     <Button
                       className={`${
@@ -413,32 +410,33 @@ export default function Page({ params }: { params: { id: string } }) {
                       </svg>
                       Fullscreen
                     </Button>
-                    {packName && nextLevelId &&  <Link
-                      href={`/${nextLevelId == -1 ? "level-packs" : "level"}/${
-                        nextLevelId == -1 ? packName : nextLevelId
-                      }`}
-                    >
-                      <Button>
-                        Next level
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="ml-3"
-                        >
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <polyline points="12 16 16 12 12 8"></polyline>
-                          <line x1="8" y1="12" x2="16" y2="12"></line>
-                        </svg>
-                      </Button>
-                    </Link>}
-                   
+                    {packName && nextLevelId && (
+                      <Link
+                        href={`/${
+                          nextLevelId == -1 ? "level-packs" : "level"
+                        }/${nextLevelId == -1 ? packName : nextLevelId}`}
+                      >
+                        <Button>
+                          Next level
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="ml-3"
+                          >
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 16 16 12 12 8"></polyline>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                          </svg>
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
@@ -466,10 +464,13 @@ export default function Page({ params }: { params: { id: string } }) {
                     </Badge>
                   )}
                 </div>
-                {packName && <div className="bg-blue-300 w-1/2 mx-auto rounded-3xl shadow-xl p-2">
-                  <p className="text-center text-white font-bold ">- {packName} -</p>
-                </div> }
-                
+                {packName && (
+                  <div className="bg-blue-300 w-1/2 mx-auto rounded-3xl shadow-xl p-2">
+                    <p className="text-center text-white font-bold ">
+                      - {packName} -
+                    </p>
+                  </div>
+                )}
 
                 <div className="p-5 font-medium ">
                   <ReactQuill
@@ -494,32 +495,33 @@ export default function Page({ params }: { params: { id: string } }) {
                 </div>
 
                 <div className="flex flex-wrap h-[10%] w-full  justify-center md:justify-between md:mr-5 bg-white bg-opacity-15 p-5 gap-4">
-                  {packName && previousLevelId && <Link
-                    href={`/${
-                      previousLevelId == -1 ? "level-packs" : "level"
-                    }/${previousLevelId == -1 ? packName : previousLevelId}`}
-                  >
-                    <Button>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-3"
-                      >
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 8 8 12 12 16"></polyline>
-                        <line x1="16" y1="12" x2="8" y2="12"></line>
-                      </svg>
-                      Previous level
-                    </Button>
-                  </Link> }
-                  
+                  {packName && previousLevelId && (
+                    <Link
+                      href={`/${
+                        previousLevelId == -1 ? "level-packs" : "level"
+                      }/${previousLevelId == -1 ? packName : previousLevelId}`}
+                    >
+                      <Button>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="mr-3"
+                        >
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 8 8 12 12 16"></polyline>
+                          <line x1="16" y1="12" x2="8" y2="12"></line>
+                        </svg>
+                        Previous level
+                      </Button>
+                    </Link>
+                  )}
 
                   <Button
                     className={`${
@@ -578,32 +580,33 @@ export default function Page({ params }: { params: { id: string } }) {
                     </svg>
                     Fullscreen
                   </Button>
-                  {packName && nextLevelId &&  <Link
-                    href={`/${nextLevelId == -1 ? "level-packs" : "level"}/${
-                      nextLevelId == -1 ? packName : nextLevelId
-                    }`}
-                  >
-                    <Button>
-                      Next level
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="ml-3"
-                      >
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 16 16 12 12 8"></polyline>
-                        <line x1="8" y1="12" x2="16" y2="12"></line>
-                      </svg>
-                    </Button>
-                  </Link> }
-                 
+                  {packName && nextLevelId && (
+                    <Link
+                      href={`/${nextLevelId == -1 ? "level-packs" : "level"}/${
+                        nextLevelId == -1 ? packName : nextLevelId
+                      }`}
+                    >
+                      <Button>
+                        Next level
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="ml-3"
+                        >
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 16 16 12 12 8"></polyline>
+                          <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </div>
             </>
