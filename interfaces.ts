@@ -13,7 +13,6 @@ export interface Level {
   description: string;
   difficulty: string;
   tags: string[];
-  unlimited: boolean;
   publishDate: Timestamp | FieldValue;
 }
 
