@@ -42,7 +42,6 @@ export default function UnityLevelEmbed({
   const FetchData = useCallback((data: any) => {
     setGameStatus(data);
     onGameStatusChange(data);
-    console.log(data);
   }, []);
 
   useEffect(() => {
@@ -54,7 +53,6 @@ export default function UnityLevelEmbed({
 
   function SendData() {
     const combinedData = `//LEVEL_NAME:${level?.name}//AUTHOR_NAME:${level?.author}//SEED:${level?.seed}///`;
-    console.log("TEST:  " + combinedData);
     sendMessage("GameManager", "FetchData", combinedData);
   }
 

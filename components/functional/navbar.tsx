@@ -118,9 +118,6 @@ export const Navbar = () => {
 
         // Add the new user document to the "users" collection
         await setDoc(userDocRef, userData);
-        console.log("New user created:", userData);
-      } else {
-        console.log("User already exists:");
       }
 
       // Set the user state
