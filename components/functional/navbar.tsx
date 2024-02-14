@@ -142,7 +142,7 @@ export const Navbar = () => {
 
   return (
     <>
-      <div className="w-full flex justify-between items-center bg-opacity-75 h-16 relative z-20 backdrop-blur-md">
+      <div className="w-full flex justify-between items-center bg-opacity-75 h-16 relative select-none z-20 backdrop-blur-md">
         <div className="flex w-full ">
           <div className="flex my-auto ml-5">
             <Link href={"/"}>
@@ -156,15 +156,6 @@ export const Navbar = () => {
           <div className="flex justify-start ml-5">
             <NavigationMenu className="hidden mx-4 md:flex my-auto">
               <NavigationMenuList className="gap-3">
-                <NavigationMenuItem>
-                  <Link href="/docs" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={navigationMenuTriggerStyle()}
-                    >
-                      <p className="text-white">Документация</p>
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link
                     href="/level-creator"
@@ -527,11 +518,6 @@ export const Navbar = () => {
                 <Link href="/">
                   <DropdownMenuItem className="cursor-pointer">
                     Начална Страница
-                  </DropdownMenuItem>
-                </Link>
-                <Link href="/docs">
-                  <DropdownMenuItem className="cursor-pointer">
-                    Документация
                   </DropdownMenuItem>
                 </Link>
                 <Link href="/level-creator">
