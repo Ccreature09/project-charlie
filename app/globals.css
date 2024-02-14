@@ -10,12 +10,26 @@
     transform: rotate(360deg);
   }
 }
+* {scroll-behavior: smooth;}
 
-/* Apply the spin animation to the SVG element */
 .spin-animation {
   animation: spin 1s linear infinite;
 }
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
 
+.bounce {
+  animation: bounce 0.5s ease infinite; 
+}
 @layer base {
   :root {
     --background: 0 0% 100%;
