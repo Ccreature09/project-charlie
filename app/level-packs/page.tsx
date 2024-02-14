@@ -6,27 +6,27 @@ import Link from "next/link";
 
 const cardData = [
   {
-    title: "Tutorial",
+    title: "Обучение",
     imageSrc: "https://cdn-icons-png.flaticon.com/512/2232/2232688.png",
   },
   {
-    title: "Basics",
+    title: "Базовите неща",
     imageSrc: "url-to-your-image-2.jpg",
   },
   {
-    title: "Intermediate",
+    title: "За начинаещите",
     imageSrc: "url-to-your-image-2.jpg",
   },
   {
-    title: "Advanced",
+    title: "За Напреднали",
     imageSrc: "url-to-your-image-2.jpg",
   },
   {
-    title: "Expert",
+    title: "За Експерти",
     imageSrc: "url-to-your-image-2.jpg",
   },
   {
-    title: "Master",
+    title: "За Майстори",
     imageSrc: "url-to-your-image-2.jpg",
   },
   // Add more card data as needed
