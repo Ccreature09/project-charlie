@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
+
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const Intro = localFont({
+  src: "../assets/4488-font.otf",
+});
 
 export const metadata: Metadata = {
   title: "PROJECT:Charlie",
@@ -17,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={Intro.className}>{children}</body>
     </html>
   );
 }
