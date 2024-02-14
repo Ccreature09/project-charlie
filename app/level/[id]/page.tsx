@@ -238,8 +238,6 @@ export default function Page({ params }: { params: { id: string } }) {
           setIsLiked(!isLiked);
 
           await updateDoc(userDoc.ref, { likedLevels: updatedLikedLevels });
-
-          console.log("Likes updated successfully!");
         } else {
           console.error("Level document not found.");
         }
