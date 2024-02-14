@@ -1,29 +1,33 @@
-"use client"
-import React from 'react';
-import { db } from '@/firebase/firebase';
-import { query, collection, where, getDocs } from 'firebase/firestore';
-import { Level } from '@/interfaces';
-import { Navbar } from '@/components/functional/navbar';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
-import { User } from '@/interfaces';
+"use client";
+import React, { useState } from "react";
+import { db } from "@/firebase/firebase";
+import { query, collection, where, getDocs } from "firebase/firestore";
+import { Level } from "@/interfaces";
+import { Navbar } from "@/components/functional/navbar";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { User } from "@/interfaces";
+import Link from "next/link";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
-const backgroundImageStyle = {
-  backgroundImage:
-    "url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')",
-  backgroundSize: 'cover',
-  width: '100%',
-};
+const ITEMS_PER_PAGE = 4;
 
 const stripHtmlTags = (html: string): string => {
-  return html.replace(/<[^>]*>?/gm, '');
+  return html.replace(/<[^>]*>?/gm, "");
 };
 
 export default function Page({ params }: { params: { query: string } }) {
-  const [slug, setSlug] = React.useState(params.query);
-  const [levels, setLevels] = React.useState<Level[]>([]);
-  const [userProfiles, setUserProfiles] = React.useState<User[]>([]);
+  const [slug, setSlug] = useState(decodeURIComponent(params.query));
+  const [levels, setLevels] = useState<Level[]>([]);
+  const [userProfiles, setUserProfiles] = useState<User[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   React.useEffect(() => {
     const fetchResults = async () => {
@@ -32,16 +36,16 @@ export default function Page({ params }: { params: { query: string } }) {
 
         // Query for level names
         const levelQuery = query(
-          collection(db, 'levels'),
-          where('name', '>=', searchQuery),
-          where('name', '<=', searchQuery + '\uf8ff')
+          collection(db, "levels"),
+          where("name", ">=", searchQuery),
+          where("name", "<=", searchQuery + "\uf8ff")
         );
 
         // Query for user profiles
         const userQuery = query(
-          collection(db, 'users'),
-          where('username', '>=', searchQuery),
-          where('username', '<=', searchQuery + '\uf8ff')
+          collection(db, "users"),
+          where("username", ">=", searchQuery),
+          where("username", "<=", searchQuery + "\uf8ff")
         );
 
         try {
@@ -65,7 +69,7 @@ export default function Page({ params }: { params: { query: string } }) {
 
           setUserProfiles(matchingUserProfiles);
         } catch (error) {
-          console.error('Error fetching results:', error);
+          console.error("Error fetching results:", error);
         }
       }
     };
@@ -73,9 +77,23 @@ export default function Page({ params }: { params: { query: string } }) {
     fetchResults();
   }, [slug]);
 
+  // Calculate total pages
+  const totalPages = Math.ceil(
+    (levels.length + userProfiles.length) / ITEMS_PER_PAGE
+  );
+
+  // Paginate the data
+  const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentLevels = levels.slice(indexOfFirstItem, indexOfLastItem);
+  const currentUserProfiles = userProfiles.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
   return (
     <>
-      <div style={backgroundImageStyle} className="h-screen ">
+      <div className="h-screen flex-row bg-cover min-h-[300vh] md:min-h-[150vh] lg:min-h-[200vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')]">
         <Navbar />
 
         <div className="m-20">
@@ -84,12 +102,12 @@ export default function Page({ params }: { params: { query: string } }) {
           </p>
 
           <div className="m-10">
-            {userProfiles.map((user) => (
+            {currentUserProfiles.map((user) => (
               <Link href={`/profile/${user.uid}`} key={user.uid}>
                 <div className="bg-blue-100 flex rounded-lg p-5 my-5">
                   <img
-                    src={user.pfp || 'default_profile_image_url'}
-                    alt={user.username + ' image'}
+                    src={user.pfp || "default_profile_image_url"}
+                    alt={user.username + " image"}
                     className="w-48"
                   />
                   <div className="">
@@ -99,41 +117,83 @@ export default function Page({ params }: { params: { query: string } }) {
               </Link>
             ))}
 
-            {levels.map((level) => (
+            {currentLevels.map((level) => (
               <div key={level.id}>
                 <Link
                   href={`/level/${encodeURIComponent(level.id)}`}
                   className="flex bg-blue-100 rounded-lg p-5 my-5"
                 >
                   <img
-                    src={level.imgURL || 'https://etc.usf.edu/clipart/21900/21988/square_21988_md.gif'}
-                    alt={level.name + ' image'}
+                    src={
+                      level.imgURL ||
+                      "https://etc.usf.edu/clipart/21900/21988/square_21988_md.gif"
+                    }
+                    alt={level.name + " image"}
                     className="w-1/4"
                   />
                   <div className="mx-10">
                     <div className="flex h-5 items-center space-x-4 ">
                       <Separator orientation="vertical" />
-                      <p className="text-3xl font-semibold text-center ">{level.name}</p>
+                      <p className="text-3xl font-semibold text-center ">
+                        {level.name}
+                      </p>
                       <Separator orientation="vertical" className="bg-black" />
                       <Badge className="bg-slate-400 rounded-lg">
-                        <img src="https://i.ibb.co/VJhxNJV/Icon-1.png" className="w-3 mr-2" alt="" />
-                        10x10
+                        <img
+                          src="https://i.ibb.co/VJhxNJV/Icon-1.png"
+                          className="w-3 mr-2"
+                          alt=""
+                        />
+                        {level.grid}
                       </Badge>
 
                       <Badge className="bg-slate-400 rounded-lg">
-                        <img src="https://i.ibb.co/KhG75bv/Rectangle-5.png" className="w-4 mr-2" alt="" />
+                        <img
+                          src="https://i.ibb.co/KhG75bv/Rectangle-5.png"
+                          className="w-4 mr-2"
+                          alt=""
+                        />
                         {level.difficulty}
                       </Badge>
-                      <Badge className="bg-slate-400 rounded-lg">{level.unlimited ? 'Unlimited' : 'Limited'}</Badge>
                     </div>
-                    {/* Strip HTML tags and render plain text */}
-                    <p className="p-5 ml-4 font-medium">{stripHtmlTags(level.description)}</p>
+                    <p className="p-5 ml-4 font-medium">
+                      {stripHtmlTags(level.description)}
+                    </p>
                   </div>
                 </Link>
               </div>
             ))}
           </div>
           <div></div>
+          {/* Pagination */}
+          <Pagination>
+            <PaginationContent className="cursor-pointer">
+              <PaginationItem>
+                <PaginationPrevious
+                  className={`${currentPage === 1 && "hidden"}`}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                />
+              </PaginationItem>
+
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(index + 1)}
+                    isActive={index + 1 === currentPage}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem>
+                <PaginationNext
+                  className={`${currentPage === totalPages && "hidden"}`}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       </div>
     </>
