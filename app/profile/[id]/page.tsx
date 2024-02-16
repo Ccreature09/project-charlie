@@ -109,24 +109,19 @@ export default function Page({ params }: { params: { id: string } }) {
       const userQuerySnapshot = await getDocs(userQuery);
 
       if (!levelsQuerySnapshot.empty) {
-        // Get the reference to the document and delete it
         const levelDocRef = doc(db, "levels", levelsQuerySnapshot.docs[0].id);
         await deleteDoc(levelDocRef);
       }
       if (!userQuerySnapshot.empty) {
-        // Get the reference to the user document
         const userDocRef = doc(db, "users", userQuerySnapshot.docs[0].id);
 
-        // Get the current levels array from the user document data
         const userData = userQuerySnapshot.docs[0].data();
         const currentLevels = userData.levels;
 
-        // Filter out the levelId from the currentLevels array
         const updatedLevels = currentLevels.filter(
           (id: number) => id !== levelId
         );
 
-        // Update the user document with the updated levels array
         await updateDoc(userDocRef, { levels: updatedLevels });
       } else {
       }
@@ -170,16 +165,21 @@ export default function Page({ params }: { params: { id: string } }) {
         {user && (
           <div className="bg-gray-500 bg-opacity-50 relative h-[50vh] mt-5 mx-10 select-none pointer-events-none rounded-xl g-cover c">
             <div className="absolute bottom-5 left-5">
-              <div className="flex">
+              <div className="flex flex-col md:flex-row">
                 <Avatar className="w-32 h-32">
                   <AvatarImage src={user.pfp}></AvatarImage>
                 </Avatar>
-                <p className="text-6xl text-white mt-16 font-black ml-10">
+                <p className=" text-3xl sm:text-6xl text-white mt-8 md:mt-16 font-black md:ml-10">
                   {user.username}
                 </p>
+                <div className="md:hidden ">
+                  <p className="text-white">
+                    Badges: {user.badges.join(", ") || "No Badges yet"}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="absolute bottom-5 right-5">
+            <div className="hidden md:block md:absolute md:bottom-5 md:right-5">
               <p className="text-white">
                 Badges: {user.badges.join(", ") || "No Badges yet"}
               </p>
@@ -191,31 +191,56 @@ export default function Page({ params }: { params: { id: string } }) {
             My Levels
           </p>
           {levels.length > 0 ? (
-            <Carousel className="mx-20 text-black mt-5">
+            <Carousel className="mx-5 text-black mt-5">
               <CarouselContent>
                 {levels.map((level) => (
-                  <CarouselItem key={level.id} className="basis-1/4">
+                  <CarouselItem
+                    key={level.id}
+                    className="basis md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                  >
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-2xl font-bold">
+                        <CardTitle className="text-2xl flex flex-col sm:flex-row font-bold">
                           {level.name}
+                          <div className="flex  mx-6 gap-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              className="my-auto "
+                            >
+                              <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                            </svg>
+
+                            <p className="text-xl flex my-auto">
+                              {level.likes}
+                            </p>
+                          </div>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <img src={level.imgURL} alt="" />
                       </CardContent>
                       <CardFooter>
-                        <div className="flex">
+                        <div className="flex flex-col  lg:flex-row items-center lg:items-start">
                           <Link
-                            className="flex my-auto mx-3"
+                            className="flex  lg:my-auto w-full  lg:mx-0"
                             href={`/level/${level.id}`}
                           >
-                            <Button>Play</Button>
+                            <Button className="w-full lg: mr-6 lg:w-auto">
+                              Play
+                            </Button>
                           </Link>
                           {isAdmin && (
                             <AlertDialog>
                               <AlertDialogTrigger>
-                                <Button className="bg-red-500 flex my-auto">
+                                <Button className="bg-red-500 w-full flex my-3 lg:my-auto">
                                   Изтрий ниво
                                 </Button>
                               </AlertDialogTrigger>
@@ -244,29 +269,7 @@ export default function Page({ params }: { params: { id: string } }) {
                               </AlertDialogContent>
                             </AlertDialog>
                           )}
-
-                          <div className="flex mx-4 gap-2">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              className="my-auto"
-                            >
-                              <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-                            </svg>
-
-                            <p className="text-xl flex my-auto">
-                              {level.likes}
-                            </p>
-                          </div>
                         </div>
-                        <div></div>
                       </CardFooter>
                     </Card>
                   </CarouselItem>
