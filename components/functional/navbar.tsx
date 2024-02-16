@@ -189,7 +189,7 @@ export const Navbar = () => {
             </NavigationMenu>
           </div>
 
-          <div className="flex justify-end w-full mr-10">
+          <div className="flex justify-end w-full md:mr-10">
             <div className="flex lg:hidden">
               <Drawer>
                 <DrawerTrigger className="mx-4">
@@ -494,7 +494,7 @@ export const Navbar = () => {
                 </svg>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel className="gap-4 flex">
+                <DropdownMenuLabel className=" flex">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -505,6 +505,7 @@ export const Navbar = () => {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    className="mx-3"
                   >
                     <circle cx="12" cy="12" r="10"></circle>
                     <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
@@ -514,21 +515,102 @@ export const Navbar = () => {
                 <DropdownMenuSeparator />
                 <Link href="/">
                   <DropdownMenuItem className="cursor-pointer">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="mx-3"
+                    >
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
                     Начална Страница
+                  </DropdownMenuItem>
+                </Link>
+                <Link href={`/profile/${user?.uid}`}>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="mx-3"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Профил
                   </DropdownMenuItem>
                 </Link>
                 <Link href="/level-creator">
                   <DropdownMenuItem className="cursor-pointer">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="mx-3"
+                    >
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="12" y1="18" x2="12" y2="12"></line>
+                      <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
                     Създай ниво!
                   </DropdownMenuItem>
                 </Link>
                 <Link href="/level-packs">
                   <DropdownMenuItem className="cursor-pointer">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="mx-3"
+                    >
+                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
                     Пакети
                   </DropdownMenuItem>
                 </Link>
                 <Link href="/discover">
                   <DropdownMenuItem className="cursor-pointer">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="mx-3"
+                    >
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
                     Отркий нива
                   </DropdownMenuItem>
                 </Link>
@@ -536,7 +618,7 @@ export const Navbar = () => {
                 {!user ? (
                   <DropdownMenuItem
                     onClick={handleGoogleSignIn}
-                    className="cursor-pointer text-green-500 gap-4"
+                    className="cursor-pointer text-green-500 "
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -548,17 +630,18 @@ export const Navbar = () => {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      className="mx-3"
                     >
                       <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
                       <polyline points="10 17 15 12 10 7"></polyline>
                       <line x1="15" y1="12" x2="3" y2="12"></line>
                     </svg>
-                    <p>Вход</p>
+                    Вход
                   </DropdownMenuItem>
                 ) : (
                   <DropdownMenuItem
                     onClick={handleSignOut}
-                    className="cursor-pointer text-red-500 gap-4"
+                    className="cursor-pointer text-red-500 "
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -570,12 +653,13 @@ export const Navbar = () => {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      className="mx-3"
                     >
                       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                       <polyline points="16 17 21 12 16 7"></polyline>
                       <line x1="21" y1="12" x2="9" y2="12"></line>
                     </svg>
-                    <p>Изход</p>
+                    Изход
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
