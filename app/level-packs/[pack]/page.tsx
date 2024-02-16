@@ -6,6 +6,11 @@ import { User } from "firebase/auth";
 import { getDocs, where, query, collection } from "firebase/firestore";
 import { db, auth } from "@/firebase/firebase";
 
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import Link from "next/link";
+import { onAuthStateChanged } from "firebase/auth";
+import { Skeleton } from "@/components/ui/skeleton";
 const stripHtmlTags = (html: string): string => {
   return html.replace(/<[^>]*>?/gm, "");
 };
@@ -61,9 +66,17 @@ export default function Page({ params }: { params: { pack: string } }) {
             );
             const levelsSnapshot = await getDocs(levelsQuery);
 
+            const levelMap: { [key: number]: Level } = {};
+
             levelsSnapshot.forEach((doc) => {
               const levelData = doc.data() as Level;
-              levelsPromises.push(levelData);
+              levelMap[levelData.id] = levelData;
+            });
+
+            levelsArray.forEach((levelId) => {
+              if (levelMap[levelId]) {
+                levelsPromises.push(levelMap[levelId]);
+              }
             });
           }
 
@@ -76,6 +89,7 @@ export default function Page({ params }: { params: { pack: string } }) {
 
     FetchLevelPack();
   }, [params.pack, user?.uid]);
+
   useEffect(() => {
     const completedLevels = userData?.completedLevels || [];
     const matchingCompletedLevels = completedLevels.filter((levelId) =>
@@ -89,30 +103,31 @@ export default function Page({ params }: { params: { pack: string } }) {
     setProgress(calculatedProgress);
   }, [userData, levels]);
   return (
-    <div className="h-screen flex-row bg-cover min-h-screen bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')]">
+    <div className="h-screen flex-row bg-cover min-h-[150vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')]">
       <Navbar></Navbar>
 
       <div className=" bg-white bg-opacity-5 hover:bg-opacity-10 mx-10 mt-10 shadow-xl text-white p-8">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
             <SettingsIcon className="text-white h-12 w-12" />
-            <div>
-              <h1 className="text-3xl font-bold">
+            <div className="flex flex-col">
+              <h1 className="text-3xl flex break-words font-bold">
                 {decodeURIComponent(params.pack)}
               </h1>
-              <p className="text-gray-400">{description}</p>
+              <p className="text-gray-400 flex break-words">{description}</p>
             </div>
           </div>
         </div>
         <div className="mt-8">
-          <div className="mt-6 mx-10 flex mb-10">
-            <h2 className="text-xl font-semibold ">Прогрес</h2>
-
-            <Progress
-              className="w-5/6 flex m-auto bg-white rounded-full h-2.5"
-              value={progress}
-            />
-            <p className="text-xl font-semibold">{progress}% </p>
+          <div className="mt-6 md:mx-10  flex flex-col md:flex-row mb-10">
+            <h2 className="text-xl text-center font-semibold ">Прогрес</h2>
+            <div className="w-full flex">
+              <Progress
+                className="w-5/6 flex m-auto bg-white rounded-full h-2.5"
+                value={progress}
+              />
+              <p className="text-xl mx-2 font-semibold">{progress}% </p>
+            </div>
           </div>
           {levels.length > 1 ? (
             <div className="space-y-4 max-h-[400px] overflow-auto">
@@ -161,12 +176,6 @@ export default function Page({ params }: { params: { pack: string } }) {
     </div>
   );
 }
-
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import Link from "next/link";
-import { onAuthStateChanged } from "firebase/auth";
-import { Skeleton } from "@/components/ui/skeleton";
 
 function CheckCircleIcon(props: any) {
   return (
