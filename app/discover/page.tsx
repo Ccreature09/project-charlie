@@ -83,7 +83,6 @@ export default function Page() {
         </p>
 
         <div>
-          {/* First Carousel */}
           <div className="my-10">
             <p className="ml-24 my-5 text-white text-3xl font-semibold select-none pointer-events-none">
               Най-нови нива
@@ -148,7 +147,6 @@ export default function Page() {
             </Carousel>
           </div>
 
-          {/* Second Carousel */}
           <div className="my-10 ">
             <p className="ml-24 my-5 text-white text-3xl font-semibold select-none pointer-events-none">
               Най-харесвани нива

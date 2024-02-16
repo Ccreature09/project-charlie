@@ -56,8 +56,8 @@ export default function Page({ params }: { params: { id: string } }) {
             const userSnapshot = await getDocs(userQuery);
             if (!userSnapshot.empty) {
               const userData = userSnapshot.docs[0].data() as UserData;
-              const completedLevels = userData.completedLevels || []; // Get the current completedLevels array
-              const updatedCompletedLevels = [...completedLevels, Number(slug)]; // Update completedLevels array (example: add a new level)
+              const completedLevels = userData.completedLevels || [];
+              const updatedCompletedLevels = [...completedLevels, Number(slug)];
 
               const userDocRef = doc(db, "users", userSnapshot.docs[0].id);
 
@@ -149,7 +149,6 @@ export default function Page({ params }: { params: { id: string } }) {
           return;
         }
 
-        // Fetch the user document
         const userQuery = query(
           collection(db, "users"),
           where("uid", "==", user.uid)
@@ -160,13 +159,11 @@ export default function Page({ params }: { params: { id: string } }) {
           const userDoc = userSnapshot.docs[0];
           const userData = userDoc.data();
 
-          // Check if the user has liked the current level
           const likedLevels = userData.likedLevels || [];
           const isLiked = likedLevels.includes(level.id);
           setIsLiked(isLiked);
         }
         if (level) {
-          // Fetch the level document
           const levelQuery = query(
             collection(db, "levels"),
             where("id", "==", level.id)
@@ -177,7 +174,6 @@ export default function Page({ params }: { params: { id: string } }) {
             const levelDoc = levelSnapshot.docs[0];
             const levelData = levelDoc.data();
 
-            // Set the likes count
             const currentLikes = levelData.likes || 0;
             setLikes(currentLikes);
           } else {
@@ -199,7 +195,6 @@ export default function Page({ params }: { params: { id: string } }) {
         return;
       }
 
-      // Fetch the user document
       const userQuery = query(
         collection(db, "users"),
         where("uid", "==", user.uid)
@@ -210,12 +205,10 @@ export default function Page({ params }: { params: { id: string } }) {
         const userDoc = userSnapshot.docs[0];
         const userData = userDoc.data();
 
-        // Check if the user has liked the current level
         const likedLevels = userData.likedLevels || [];
         const isLiked = likedLevels.includes(level.id);
         setIsLiked(isLiked);
 
-        // Update the likes count
         const levelQuery = query(
           collection(db, "levels"),
           where("id", "==", level.id)
@@ -228,10 +221,8 @@ export default function Page({ params }: { params: { id: string } }) {
           const updatedLikes = isLiked ? currentLikes - 1 : currentLikes + 1;
           setLikes(updatedLikes);
 
-          // Update the level document with the new likes count
           await updateDoc(levelDoc.ref, { likes: updatedLikes });
 
-          // Update the likedLevels array in the user document
           const updatedLikedLevels = isLiked
             ? likedLevels.filter((id: number) => id !== level.id)
             : [...likedLevels, level.id];
@@ -385,7 +376,6 @@ export default function Page({ params }: { params: { id: string } }) {
                     </Button>
                     <Button
                       onClick={() => {
-                        // Toggle the fullscreen state
                         setRequestFullscreen((prevState) => !prevState);
                       }}
                     >
@@ -555,7 +545,6 @@ export default function Page({ params }: { params: { id: string } }) {
                   </Button>
                   <Button
                     onClick={() => {
-                      // Toggle the fullscreen state
                       setRequestFullscreen((prevState) => !prevState);
                     }}
                   >
