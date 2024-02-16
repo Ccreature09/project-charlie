@@ -14,7 +14,7 @@ export default function UnityLevelEmbed({
   onFetchSeed: (status: string) => void;
   onFetchScreenshot: (status: string | undefined) => void;
   onScreenshot: boolean;
-  onDraftSeed:string;
+  onDraftSeed: string;
   onFullscreen: boolean;
   onHideUI: boolean;
   onGridSize: string;
@@ -49,14 +49,11 @@ export default function UnityLevelEmbed({
   useEffect(() => {
     const dataUrl = takeScreenshot("image/jpg", 0.5);
     onFetchScreenshot(dataUrl);
-    //   newWindow.document.write('<img src="' + dataUrl + '" />');
   }, [onScreenshot]);
 
   useEffect(() => {
     sendMessage("GameManager", "FetchData", onGridSize);
-    
   }, [onGridSize]);
-
 
   useEffect(() => {
     setHideUI(!hideUI);
@@ -67,21 +64,23 @@ export default function UnityLevelEmbed({
     );
   }, [onHideUI]);
 
-    useEffect(() => {
-      sendMessage("GameManager", "FetchData", `InstantiateDraft:${onDraftSeed}`);
-    }, [onDraftSeed])
-    
+  useEffect(() => {
+    sendMessage("GameManager", "FetchData", `InstantiateDraft:${onDraftSeed}`);
+  }, [onDraftSeed]);
 
   useEffect(() => {
     setLoadingPercentage(Math.round(loadingProgression * 100));
     if (isLoaded) {
       if (onDraftSeed != "") {
-        sendMessage("GameManager", "FetchData", `InstantiateDraft:${onDraftSeed}`);
-      }else{
+        sendMessage(
+          "GameManager",
+          "FetchData",
+          `InstantiateDraft:${onDraftSeed}`
+        );
+      } else {
         sendMessage("GameManager", "FetchData", "Instantiate:3,3");
       }
     }
-    
   }, [isLoaded, loadingProgression]);
 
   const FetchData = useCallback((data: any) => {
