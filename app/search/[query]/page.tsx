@@ -34,14 +34,12 @@ export default function Page({ params }: { params: { query: string } }) {
       if (slug) {
         const searchQuery = decodeURIComponent(slug);
 
-        // Query for level names
         const levelQuery = query(
           collection(db, "levels"),
           where("name", ">=", searchQuery),
           where("name", "<=", searchQuery + "\uf8ff")
         );
 
-        // Query for user profiles
         const userQuery = query(
           collection(db, "users"),
           where("username", ">=", searchQuery),
@@ -77,12 +75,10 @@ export default function Page({ params }: { params: { query: string } }) {
     fetchResults();
   }, [slug]);
 
-  // Calculate total pages
   const totalPages = Math.ceil(
     (levels.length + userProfiles.length) / ITEMS_PER_PAGE
   );
 
-  // Paginate the data
   const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
   const currentLevels = levels.slice(indexOfFirstItem, indexOfLastItem);
@@ -96,22 +92,25 @@ export default function Page({ params }: { params: { query: string } }) {
       <div className="h-screen flex-row bg-cover min-h-[300vh] md:min-h-[150vh] lg:min-h-[200vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')]">
         <Navbar />
 
-        <div className="m-20">
+        <div className="m-10 lg:m-20">
           <p className="text-3xl text-white mb-16">
-            Results for <span className="font-semibold">{slug}</span>:
+            Резултати за <span className="font-semibold underline">{slug}</span>
+            :
           </p>
 
-          <div className="m-10">
+          <div className="mb-5 lg:m-10">
             {currentUserProfiles.map((user) => (
-              <Link href={`/profile/${user.uid}`} key={user.uid}>
-                <div className="bg-blue-100 flex rounded-lg p-5 my-5">
+              <Link href={`/profile/${user.uid}`} className="" key={user.uid}>
+                <div className="bg-blue-100 flex rounded-lg  flex-col md:flex-row p-5 my-5">
                   <img
                     src={user.pfp || "default_profile_image_url"}
                     alt={user.username + " image"}
                     className="w-48"
                   />
                   <div className="">
-                    <p className="text-4xl font-bold ml-4">{user.username}</p>
+                    <p className="text-2xl mt-5 md:text-4xl font-bold ml-4">
+                      {user.username}
+                    </p>
                   </div>
                 </div>
               </Link>
@@ -121,7 +120,7 @@ export default function Page({ params }: { params: { query: string } }) {
               <div key={level.id}>
                 <Link
                   href={`/level/${encodeURIComponent(level.id)}`}
-                  className="flex bg-blue-100 rounded-lg p-5 my-5"
+                  className="flex flex-col lg:flex-row bg-blue-100 rounded-lg my-0  lg:my-5"
                 >
                   <img
                     src={
@@ -129,34 +128,35 @@ export default function Page({ params }: { params: { query: string } }) {
                       "https://etc.usf.edu/clipart/21900/21988/square_21988_md.gif"
                     }
                     alt={level.name + " image"}
-                    className="w-1/4"
+                    className="w-full mb-10 lg:mb-0 flex lg:w-1/4"
                   />
-                  <div className="mx-10">
+                  <div className="flex flex-col mx-5 lg:mx-10 lg:mt-10">
                     <div className="flex h-5 items-center space-x-4 ">
-                      <Separator orientation="vertical" />
-                      <p className="text-3xl font-semibold text-center ">
+                      <p className="sm:text-lg md:text-xl lg:text-3xl font-semibold text-center ">
                         {level.name}
                       </p>
                       <Separator orientation="vertical" className="bg-black" />
-                      <Badge className="bg-slate-400 rounded-lg">
-                        <img
-                          src="https://i.ibb.co/VJhxNJV/Icon-1.png"
-                          className="w-3 mr-2"
-                          alt=""
-                        />
-                        {level.grid}
-                      </Badge>
+                      <div>
+                        <Badge className="bg-slate-400 rounded-lg mx-3">
+                          <img
+                            src="https://i.ibb.co/VJhxNJV/Icon-1.png"
+                            className="w-3 mr-2"
+                            alt=""
+                          />
+                          {level.grid}
+                        </Badge>
 
-                      <Badge className="bg-slate-400 rounded-lg">
-                        <img
-                          src="https://i.ibb.co/KhG75bv/Rectangle-5.png"
-                          className="w-4 mr-2"
-                          alt=""
-                        />
-                        {level.difficulty}
-                      </Badge>
+                        <Badge className="bg-slate-400 rounded-lg">
+                          <img
+                            src="https://i.ibb.co/KhG75bv/Rectangle-5.png"
+                            className="w-4 mr-2"
+                            alt=""
+                          />
+                          {level.difficulty}
+                        </Badge>
+                      </div>
                     </div>
-                    <p className="p-5 ml-4 font-medium">
+                    <p className="lg:p-5 my-10 lg:mt-0 ml-4 font-medium">
                       {stripHtmlTags(level.description)}
                     </p>
                   </div>
@@ -164,7 +164,6 @@ export default function Page({ params }: { params: { query: string } }) {
               </div>
             ))}
           </div>
-          <div></div>
           {/* Pagination */}
           <Pagination>
             <PaginationContent className="cursor-pointer">
