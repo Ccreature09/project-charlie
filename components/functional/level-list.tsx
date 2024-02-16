@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -11,7 +10,6 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -47,28 +45,23 @@ export default function LevelList() {
     };
     setMount(true);
     fetchLevels();
-  }, []); // Empty dependency array ensures the effect runs once when the component mounts
-
-
- 
+  }, []);
 
   const handleDeleteLevel = (levelId: number) => {
-    // Implement your delete level logic here
     alert(`Deleting level ${levelId}`);
   };
-  
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentLevels = levels.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Calculate total pages
   const totalPages = Math.ceil(levels.length / itemsPerPage);
 
   return (
     <>
       {mount && (
         <div>
-          <Table className="mb-5" >
+          <Table className="mb-5">
             <TableHeader className="w-full">
               <TableRow className="w-full mx-auto">
                 <TableHead className="text-center text-white">
@@ -83,7 +76,7 @@ export default function LevelList() {
                 <TableHead className="text-center text-white">
                   Grid Size
                 </TableHead>
-               
+
                 <TableHead className="text-center text-white">Author</TableHead>
                 <TableHead className="text-center text-white">
                   Publish Date
@@ -121,12 +114,11 @@ export default function LevelList() {
                   <TableCell>
                     {/* Actions column */}
                     {/* Visit Level Button */}
-                   
-                    <Link
-                    href={`/level/${level.id}`}
-                    > <Button >
-                    Visit Level
-                  </Button></Link>
+
+                    <Link href={`/level/${level.id}`}>
+                      {" "}
+                      <Button>Visit Level</Button>
+                    </Link>
                     {/* Delete Level Button */}
                     <Button onClick={() => handleDeleteLevel(level.id)}>
                       Delete Level
@@ -136,11 +128,13 @@ export default function LevelList() {
               ))}
             </TableBody>
           </Table>
-          <Pagination className="" >
+          <Pagination className="">
             <PaginationContent className="cursor-pointer">
               <PaginationItem>
-              <PaginationPrevious  className={`${currentPage === 1 && 'hidden'}`} onClick={() => setCurrentPage(currentPage - 1)} />
-
+                <PaginationPrevious
+                  className={`${currentPage === 1 && "hidden"}`}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                />
               </PaginationItem>
               {/* Generate pagination links dynamically */}
               {[...Array(totalPages)].map((_, index) => (
@@ -154,8 +148,10 @@ export default function LevelList() {
                 </PaginationItem>
               ))}
               <PaginationItem>
-        <PaginationNext  className={`${currentPage === totalPages && 'hidden'}`} onClick={() => setCurrentPage(currentPage + 1)} />
-
+                <PaginationNext
+                  className={`${currentPage === totalPages && "hidden"}`}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                />
               </PaginationItem>
             </PaginationContent>
           </Pagination>

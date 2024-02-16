@@ -60,6 +60,7 @@ import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const provider = new GoogleAuthProvider();
 const adminArray = ["qAYbbta2AgRfev9NTEbMUqL1r212"];
@@ -97,7 +98,6 @@ export const Navbar = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Check if the user already exists in the "users" collection
       const userDocRef = doc(db, "users", user.uid);
       const querySnapshot = await query(
         collection(db, "users"),
@@ -106,21 +106,19 @@ export const Navbar = () => {
       const queryData = await getDocs(querySnapshot);
 
       if (queryData.empty) {
-        // User does not exist, create a new user document
         const userData = {
           uid: user.uid,
           pfp: user.photoURL,
-          username: user.displayName || "", // You can adjust this as needed
+          username: user.displayName || "",
+          lowercaseUsername: user.displayName?.toLowerCase(),
           dateOfRegistration: serverTimestamp(),
-          badges: [], // Initialize with an empty array
-          levels: [], // Initialize with an empty array
+          badges: [],
+          levels: [],
         };
 
-        // Add the new user document to the "users" collection
         await setDoc(userDocRef, userData);
       }
 
-      // Set the user state
       setUser(user);
     } catch (error) {
       console.error("Google sign-in failed:", error);
@@ -143,10 +141,11 @@ export const Navbar = () => {
         <div className="flex w-full ">
           <div className="flex my-auto ml-5">
             <Link href={"/"}>
-              <img
+              <Image
                 src="https://i.ibb.co/RCkLHNs/Logo-1-ai-brush-removebg-qztjehsw.png"
-                alt=""
-                className="w-24"
+                width={100}
+                height={100}
+                alt="Logo"
               />
             </Link>
           </div>
@@ -219,7 +218,7 @@ export const Navbar = () => {
                         onChange={(e) => {
                           setSearchQuery(e.target.value);
                         }}
-                        placeholder="Search for a level or user..."
+                        placeholder="Потърси за ниво или потребител"
                       />
                       <Button className="mx-5" onClick={handleSearch}>
                         {loading ? (
@@ -309,7 +308,7 @@ export const Navbar = () => {
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                       </svg>
                     </div>
-                    <p className="text-white my-auto flex mx-5">Search...</p>
+                    <p className="text-white my-auto flex mx-5">Потърси...</p>
                   </div>
                 </DialogTrigger>
                 <DialogContent>
@@ -320,7 +319,7 @@ export const Navbar = () => {
                         onChange={(e) => {
                           setSearchQuery(e.target.value);
                         }}
-                        placeholder="Search for a level or user..."
+                        placeholder="Потърси за ниво или потребител..."
                       />
                       <Button className="mx-5" onClick={handleSearch}>
                         {loading ? (

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -11,7 +10,6 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -60,14 +58,13 @@ export default function UserList() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentUsers = users.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Calculate total pages
   const totalPages = Math.ceil(users.length / itemsPerPage);
 
   return (
     <>
       {mount && (
         <div>
-          <Table className="mb-5" >
+          <Table className="mb-5">
             <TableHeader>
               <TableRow>
                 <TableHead className="text-center text-white">
@@ -118,11 +115,13 @@ export default function UserList() {
               ))}
             </TableBody>
           </Table>
-          <Pagination >
+          <Pagination>
             <PaginationContent className="cursor-pointer">
               <PaginationItem>
-              <PaginationPrevious  className={`${currentPage === 1 && 'hidden'}`} onClick={() => setCurrentPage(currentPage - 1)} />
-
+                <PaginationPrevious
+                  className={`${currentPage === 1 && "hidden"}`}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                />
               </PaginationItem>
               {/* Generate pagination links dynamically */}
               {[...Array(totalPages)].map((_, index) => (
@@ -136,8 +135,10 @@ export default function UserList() {
                 </PaginationItem>
               ))}
               <PaginationItem>
-        <PaginationNext  className={`${currentPage === totalPages && 'hidden'}`} onClick={() => setCurrentPage(currentPage + 1)} />
-
+                <PaginationNext
+                  className={`${currentPage === totalPages && "hidden"}`}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                />
               </PaginationItem>
             </PaginationContent>
           </Pagination>

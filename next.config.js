@@ -19,6 +19,10 @@ module.exports = withPWA({
         protocol: "https",
         hostname: "i.ibb.co",
       },
+      {
+        protocol: "https",
+        hostname: "img.itch.zone",
+      },
     ],
   },
 });

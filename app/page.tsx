@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 export default function Home() {
@@ -36,8 +37,10 @@ export default function Home() {
         <Navbar></Navbar>
         <div className="md:flex  flex-row select-none pointer-events-none">
           <div className="md:hidden flex">
-            <img
+            <Image
               src="https://img.itch.zone/aW1nLzQ5NDI5NjkuZ2lm/original/z2%2Bcie.gif"
+              width={200}
+              height={200}
               alt=""
               className="flex m-auto w-1/2"
             />
@@ -61,9 +64,11 @@ export default function Home() {
           </div>
 
           <div className="hidden md:flex md:w-1/2">
-            <img
+            <Image
               src="https://img.itch.zone/aW1nLzQ5NDI5NjkuZ2lm/original/z2%2Bcie.gif"
               alt=""
+              width={1000}
+              height={1000}
               className="flex m-auto"
             />
           </div>
@@ -108,8 +113,10 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent className="pointer-events-none">
-              <img
+              <Image
                 src="https://i.ibb.co/47qknKD/image.png"
+                width={1000}
+                height={500}
                 className="rounded-lg"
                 alt=""
               />
@@ -128,8 +135,10 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent className="pointer-events-none">
-              <img
+              <Image
                 src="https://i.ibb.co/n0x3tfF/image.png"
+                width={1000}
+                height={500}
                 className="rounded-lg"
                 alt=""
               />

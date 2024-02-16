@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Page({ params }: { params: { id: string } }) {
   const [user, setUser] = useState<User | null>(null);
@@ -174,21 +175,21 @@ export default function Page({ params }: { params: { id: string } }) {
                 </p>
                 <div className="md:hidden ">
                   <p className="text-white">
-                    Badges: {user.badges.join(", ") || "No Badges yet"}
+                    Значки: {user.badges.join(", ") || "Още няма значки..."}
                   </p>
                 </div>
               </div>
             </div>
             <div className="hidden md:block md:absolute md:bottom-5 md:right-5">
               <p className="text-white">
-                Badges: {user.badges.join(", ") || "No Badges yet"}
+                Значки: {user.badges.join(", ") || "Още няма значки..."}
               </p>
             </div>
           </div>
         )}
         <div className="mx-10 text-4xl text-white font-bold">
           <p className="mt-10 ml-5 select-none pointer-events-none">
-            My Levels
+            Моите нива
           </p>
           {levels.length > 0 ? (
             <Carousel className="mx-5 text-black mt-5">
@@ -225,7 +226,12 @@ export default function Page({ params }: { params: { id: string } }) {
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <img src={level.imgURL} alt="" />
+                        <Image
+                          src={level.imgURL}
+                          width={500}
+                          height={500}
+                          alt="Снимка на ниво"
+                        />
                       </CardContent>
                       <CardFooter>
                         <div className="flex flex-col  lg:flex-row items-center lg:items-start">
@@ -280,7 +286,7 @@ export default function Page({ params }: { params: { id: string } }) {
             </Carousel>
           ) : (
             <p className="text-xl m-10 select-none pointer-events-none">
-              No levels yet...
+              Още няма нива...
             </p>
           )}
 

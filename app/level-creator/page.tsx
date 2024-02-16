@@ -50,6 +50,7 @@ import {
 import UnityLevelEmbed from "@/components/functional/unity-levelcreator";
 import { Navbar } from "@/components/functional/navbar";
 import UserForm from "@/components/functional/signIn";
+import Image from "next/image";
 
 const provider = new GoogleAuthProvider();
 const toolbarOptions = [
@@ -79,6 +80,7 @@ export default function Page() {
     publishDate: serverTimestamp(),
     grid: "",
     name: "",
+    lowercaseName: "",
     description: "",
     difficulty: "",
   };
@@ -212,8 +214,8 @@ export default function Page() {
         setNewLevel({ ...newLevel, seed: finalSeed });
         const newLevelData = {
           ...newLevel,
+          lowercaseName: newLevel.name.toLowerCase(),
           seed: seed,
-          likes: 0,
           grid: `${width}x${height}`,
           id: levelCount,
           author: user?.displayName,
@@ -383,7 +385,12 @@ export default function Page() {
                           Снимка: {!newLevel.imgURL && "няма..."}
                         </p>
 
-                        <img src={newLevel.imgURL} alt="" />
+                        <Image
+                          src={newLevel.imgURL}
+                          width={500}
+                          height={500}
+                          alt="Снимка на ниво"
+                        />
                       </div>
                       <div>
                         <div className="mt-10">
@@ -646,7 +653,12 @@ export default function Page() {
                         Снимка: {!newLevel.imgURL && "няма..."}
                       </p>
                       {newLevel.imgURL ? (
-                        <img src={newLevel.imgURL} alt="" />
+                        <Image
+                          src={newLevel.imgURL}
+                          width={500}
+                          height={500}
+                          alt="Снимка на ниво"
+                        />
                       ) : (
                         <Skeleton className="w-full h-[225px] " />
                       )}

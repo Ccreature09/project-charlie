@@ -21,7 +21,7 @@ import { db } from "@/firebase/firebase";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import Image from "next/image";
 export default function Page() {
   const [newLevels, setNewLevels] = useState<Level[]>([]);
   const [likedLevels, setLikedLevels] = useState<Level[]>([]);
@@ -75,7 +75,7 @@ export default function Page() {
 
   return (
     <>
-      <div className="h-screen bg-cover min-h-[125vh] 2xl:min-h-[150vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] ">
+      <div className="h-screen bg-cover min-h-[200vh] 2xl:min-h-[150vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] ">
         <Navbar></Navbar>
 
         <p className="text-5xl text-white mt-10 font-bold text-center select-none pointer-events-none">
@@ -84,7 +84,7 @@ export default function Page() {
 
         <div>
           <div className="my-10">
-            <p className="ml-24 my-5 text-white text-3xl font-semibold select-none pointer-events-none">
+            <p className=" text-center md:text-left md:ml-24 my-5 text-white text-3xl font-semibold select-none pointer-events-none">
               Най-нови нива
             </p>
             <Carousel className=" mx-20">
@@ -100,7 +100,12 @@ export default function Page() {
                           <CardTitle>{level.name}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <img src={level.imgURL} className="" alt="" />
+                          <Image
+                            src={level.imgURL}
+                            width={500}
+                            height={300}
+                            alt="Level Image"
+                          />
                         </CardContent>
                         <CardFooter>
                           <Link href={`/level/${level.id}`}>
@@ -148,7 +153,7 @@ export default function Page() {
           </div>
 
           <div className="my-10 ">
-            <p className="ml-24 my-5 text-white text-3xl font-semibold select-none pointer-events-none">
+            <p className="text-center md:text-left md:ml-24 my-5 text-white text-3xl font-semibold select-none pointer-events-none">
               Най-харесвани нива
             </p>
             <Carousel className=" mx-20">
@@ -164,7 +169,12 @@ export default function Page() {
                           <CardTitle>{level.name}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <img src={level.imgURL} className="" alt="" />
+                          <Image
+                            src={level.imgURL}
+                            width={500}
+                            height={300}
+                            alt="Level Image"
+                          />
                         </CardContent>
                         <CardFooter>
                           <Link href={`/level/${level.id}`}>

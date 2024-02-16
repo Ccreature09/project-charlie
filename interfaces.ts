@@ -6,6 +6,7 @@ export interface Level {
   seed: string;
   grid: string;
   name: string;
+  lowercaseName: string;
   author: string;
   authorUID: string;
   pfp: string;
@@ -20,6 +21,7 @@ export interface User {
   uid: string;
   pfp: string;
   username: string;
+  lowercaseUsername: string;
   badges: string[];
   levels: number[];
   draftLevel: Level;

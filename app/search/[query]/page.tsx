@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { db } from "@/firebase/firebase";
 import { query, collection, where, getDocs } from "firebase/firestore";
 import { Level } from "@/interfaces";
@@ -16,6 +16,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import Image from "next/image";
 
 const ITEMS_PER_PAGE = 4;
 
@@ -29,21 +30,21 @@ export default function Page({ params }: { params: { query: string } }) {
   const [userProfiles, setUserProfiles] = useState<User[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchResults = async () => {
       if (slug) {
-        const searchQuery = decodeURIComponent(slug);
+        const searchQuery = decodeURIComponent(slug).toLowerCase(); // Convert query to lowercase
 
         const levelQuery = query(
           collection(db, "levels"),
-          where("name", ">=", searchQuery),
-          where("name", "<=", searchQuery + "\uf8ff")
+          where("lowercaseName", ">=", searchQuery), // Assuming "nameLowerCase" is the lowercase version of "name"
+          where("lowercaseName", "<=", searchQuery + "\uf8ff")
         );
 
         const userQuery = query(
           collection(db, "users"),
-          where("username", ">=", searchQuery),
-          where("username", "<=", searchQuery + "\uf8ff")
+          where("lowercaseUsername", ">=", searchQuery), // Assuming "usernameLowerCase" is the lowercase version of "username"
+          where("lowercaseUsername", "<=", searchQuery + "\uf8ff")
         );
 
         try {
@@ -94,20 +95,20 @@ export default function Page({ params }: { params: { query: string } }) {
 
         <div className="m-10 lg:m-20">
           <p className="text-3xl text-white mb-16">
-            Резултати за <span className="font-semibold underline">{slug}</span>
-            :
+            Results for <span className="font-semibold underline">{slug}</span>:
           </p>
 
           <div className="mb-5 lg:m-10">
             {currentUserProfiles.map((user) => (
               <Link href={`/profile/${user.uid}`} className="" key={user.uid}>
                 <div className="bg-blue-100 flex rounded-lg  flex-col md:flex-row p-5 my-5">
-                  <img
+                  <Image
                     src={user.pfp || "default_profile_image_url"}
+                    width={200}
+                    height={200}
                     alt={user.username + " image"}
-                    className="w-48"
                   />
-                  <div className="">
+                  <div>
                     <p className="text-2xl mt-5 md:text-4xl font-bold ml-4">
                       {user.username}
                     </p>
@@ -122,11 +123,13 @@ export default function Page({ params }: { params: { query: string } }) {
                   href={`/level/${encodeURIComponent(level.id)}`}
                   className="flex flex-col lg:flex-row bg-blue-100 rounded-lg my-0  lg:my-5"
                 >
-                  <img
+                  <Image
                     src={
                       level.imgURL ||
                       "https://etc.usf.edu/clipart/21900/21988/square_21988_md.gif"
                     }
+                    width={500}
+                    height={250}
                     alt={level.name + " image"}
                     className="w-full mb-10 lg:mb-0 flex lg:w-1/4"
                   />
@@ -138,19 +141,23 @@ export default function Page({ params }: { params: { query: string } }) {
                       <Separator orientation="vertical" className="bg-black" />
                       <div>
                         <Badge className="bg-slate-400 rounded-lg mx-3">
-                          <img
+                          <Image
                             src="https://i.ibb.co/VJhxNJV/Icon-1.png"
-                            className="w-3 mr-2"
-                            alt=""
+                            className="mr-2"
+                            width={15}
+                            height={15}
+                            alt="Grid Icon"
                           />
                           {level.grid}
                         </Badge>
 
                         <Badge className="bg-slate-400 rounded-lg">
-                          <img
+                          <Image
                             src="https://i.ibb.co/KhG75bv/Rectangle-5.png"
-                            className="w-4 mr-2"
-                            alt=""
+                            className="mr-2"
+                            width={15}
+                            height={15}
+                            alt="Difficulty Icon"
                           />
                           {level.difficulty}
                         </Badge>
@@ -164,35 +171,74 @@ export default function Page({ params }: { params: { query: string } }) {
               </div>
             ))}
           </div>
-          {/* Pagination */}
-          <Pagination>
-            <PaginationContent className="cursor-pointer">
-              <PaginationItem>
-                <PaginationPrevious
-                  className={`${currentPage === 1 && "hidden"}`}
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                />
-              </PaginationItem>
-
-              {[...Array(totalPages)].map((_, index) => (
-                <PaginationItem key={index}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(index + 1)}
-                    isActive={index + 1 === currentPage}
-                  >
-                    {index + 1}
-                  </PaginationLink>
+          <button
+            onClick={() => {
+              console.log(currentLevels.length);
+            }}
+          >
+            asdasd
+          </button>
+          {currentLevels.length > 0 ? (
+            <Pagination>
+              <PaginationContent className="cursor-pointer">
+                <PaginationItem>
+                  <PaginationPrevious
+                    className={`${currentPage === 1 && "hidden"}`}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  />
                 </PaginationItem>
-              ))}
 
-              <PaginationItem>
-                <PaginationNext
-                  className={`${currentPage === totalPages && "hidden"}`}
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+                {[...Array(totalPages)].map((_, index) => (
+                  <PaginationItem key={index}>
+                    <PaginationLink
+                      onClick={() => setCurrentPage(index + 1)}
+                      isActive={index + 1 === currentPage}
+                    >
+                      {index + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                <PaginationItem>
+                  <PaginationNext
+                    className={`${currentPage === totalPages && "hidden"}`}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          ) : (
+            currentLevels.length > 0 && (
+              <Pagination>
+                <PaginationContent className="cursor-pointer">
+                  <PaginationItem>
+                    <PaginationPrevious
+                      className={`${currentPage === 1 && "hidden"}`}
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                    />
+                  </PaginationItem>
+
+                  {[...Array(totalPages)].map((_, index) => (
+                    <PaginationItem key={index}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(index + 1)}
+                        isActive={index + 1 === currentPage}
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      className={`${currentPage === totalPages && "hidden"}`}
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )
+          )}
         </div>
       </div>
     </>

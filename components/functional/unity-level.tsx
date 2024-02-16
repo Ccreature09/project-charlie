@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Unity, useUnityContext } from "react-unity-webgl";
-import { Button } from "../ui/button";
 import { Level } from "@/interfaces";
 import { Progress } from "../ui/progress";
 
@@ -14,7 +13,6 @@ export default function UnityLevelEmbed({
   onFullscreen: boolean;
 }) {
   const [loadingPercentage, setLoadingPercentage] = useState(0);
-  const [gameStatus, setGameStatus] = useState("");
   const {
     unityProvider,
     sendMessage,
@@ -40,7 +38,6 @@ export default function UnityLevelEmbed({
   }, [isLoaded, loadingProgression]);
 
   const FetchData = useCallback((data: any) => {
-    setGameStatus(data);
     onGameStatusChange(data);
   }, []);
 
