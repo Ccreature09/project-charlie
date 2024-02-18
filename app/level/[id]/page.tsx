@@ -29,7 +29,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [packName, setPackName] = useState("");
   const [gameStatus, setGameStatus] = useState("");
   const [previousLevelId, setPreviousLevelId] = useState<number>();
-  const [likes, setLikes] = useState<number>();
+  const [likes, setLikes] = useState<number>(0);
   const [isLiked, setIsLiked] = useState<boolean>();
   const [nextLevelId, setNextLevelId] = useState<number>();
   const [requestFullscreen, setRequestFullscreen] = useState(false);
@@ -337,17 +337,18 @@ export default function Page({ params }: { params: { id: string } }) {
                             <polyline points="12 8 8 12 12 16"></polyline>
                             <line x1="16" y1="12" x2="8" y2="12"></line>
                           </svg>
-                          Previous level
+                          Предишно ниво
                         </Button>
                       </Link>
                     )}
 
                     <Button
+                      disabled={!userData}
                       className={`${
                         isLiked
                           ? "hover:bg-red-500 bg-green-500 "
                           : "hover:bg-green-500 "
-                      }`}
+                      } `}
                       onClick={() => {
                         handleLikeClick();
                       }}
@@ -371,7 +372,14 @@ export default function Page({ params }: { params: { id: string } }) {
                           isLiked ? "block" : "hidden"
                         }`}
                       >
-                        {isLiked ? "Liked" : "Like"} ({likes})
+                        {isLiked
+                          ? "Харесвано"
+                          : `${
+                              userData
+                                ? "Харесвай"
+                                : "Регистрирай се за да харесаш нивото!"
+                            }`}
+                        {userData && ` (${likes})`}
                       </span>
                     </Button>
                     <Button
@@ -396,7 +404,7 @@ export default function Page({ params }: { params: { id: string } }) {
                         <line x1="21" y1="3" x2="14" y2="10"></line>
                         <line x1="3" y1="21" x2="10" y2="14"></line>
                       </svg>
-                      Fullscreen
+                      Цял екран
                     </Button>
                     {packName && nextLevelId && (
                       <Link
@@ -405,7 +413,7 @@ export default function Page({ params }: { params: { id: string } }) {
                         }/${nextLevelId == -1 ? packName : nextLevelId}`}
                       >
                         <Button>
-                          Next level
+                          Следващо ниво
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -506,17 +514,18 @@ export default function Page({ params }: { params: { id: string } }) {
                           <polyline points="12 8 8 12 12 16"></polyline>
                           <line x1="16" y1="12" x2="8" y2="12"></line>
                         </svg>
-                        Previous level
+                        Предишно ниво
                       </Button>
                     </Link>
                   )}
 
                   <Button
+                    disabled={!userData}
                     className={`${
                       isLiked
                         ? "hover:bg-red-500 bg-green-500 "
                         : "hover:bg-green-500 "
-                    }`}
+                    } `}
                     onClick={() => {
                       handleLikeClick();
                     }}
@@ -540,7 +549,14 @@ export default function Page({ params }: { params: { id: string } }) {
                         isLiked ? "block" : "hidden"
                       }`}
                     >
-                      {isLiked ? "Liked" : "Like"} ({likes})
+                      {isLiked
+                        ? "Харесвано"
+                        : `${
+                            userData
+                              ? "Харесвай"
+                              : "Регистрирай се за да харесаш нивото!"
+                          }`}
+                      {userData && ` (${likes})`}
                     </span>
                   </Button>
                   <Button
@@ -565,7 +581,7 @@ export default function Page({ params }: { params: { id: string } }) {
                       <line x1="21" y1="3" x2="14" y2="10"></line>
                       <line x1="3" y1="21" x2="10" y2="14"></line>
                     </svg>
-                    Fullscreen
+                    Цял екран
                   </Button>
                   {packName && nextLevelId && (
                     <Link
@@ -574,7 +590,7 @@ export default function Page({ params }: { params: { id: string } }) {
                       }`}
                     >
                       <Button>
-                        Next level
+                        Следващо ниво
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
