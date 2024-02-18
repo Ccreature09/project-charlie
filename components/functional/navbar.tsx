@@ -115,6 +115,7 @@ export const Navbar = () => {
           badges: [],
           levels: [],
           likedLevels: [],
+          completedLevels: [],
         };
 
         await setDoc(userDocRef, userData);
