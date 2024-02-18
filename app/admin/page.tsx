@@ -10,7 +10,10 @@ import UserList from "@/components/functional/user-list";
 
 export default function Page() {
   const router = useRouter();
-  const adminArray = ["qAYbbta2AgRfev9NTEbMUqL1r212"];
+  const adminArray = [
+    "qAYbbta2AgRfev9NTEbMUqL1r212",
+    "MWqu2NDaXhPM8dpXVSVwk9u4LUs1",
+  ];
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {

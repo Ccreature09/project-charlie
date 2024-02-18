@@ -63,7 +63,10 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 const provider = new GoogleAuthProvider();
-const adminArray = ["qAYbbta2AgRfev9NTEbMUqL1r212"];
+const adminArray = [
+  "qAYbbta2AgRfev9NTEbMUqL1r212",
+  "MWqu2NDaXhPM8dpXVSVwk9u4LUs1",
+];
 
 export const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
