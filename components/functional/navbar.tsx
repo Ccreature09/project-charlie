@@ -65,7 +65,7 @@ import Image from "next/image";
 const provider = new GoogleAuthProvider();
 const adminArray = [
   "qAYbbta2AgRfev9NTEbMUqL1r212",
-  "MWqu2NDaXhPM8dpXVSVwk9u4LUs1",
+  "XsbxDDcsqwdDtKfN2xXETX9lCID2",
 ];
 
 export const Navbar = () => {

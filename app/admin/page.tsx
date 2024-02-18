@@ -12,7 +12,7 @@ export default function Page() {
   const router = useRouter();
   const adminArray = [
     "qAYbbta2AgRfev9NTEbMUqL1r212",
-    "MWqu2NDaXhPM8dpXVSVwk9u4LUs1",
+    "XsbxDDcsqwdDtKfN2xXETX9lCID2",
   ];
 
   useEffect(() => {
