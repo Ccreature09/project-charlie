@@ -95,7 +95,7 @@ export default function Page({ params }: { params: { query: string } }) {
 
         <div className="m-10 lg:m-20">
           <p className="text-3xl text-white mb-16">
-            Results for <span className="font-semibold underline">{slug}</span>:
+            Резултати за <span className="font-semibold ">{slug}</span>:
           </p>
 
           <div className="mb-5 lg:m-10">
@@ -171,13 +171,12 @@ export default function Page({ params }: { params: { query: string } }) {
               </div>
             ))}
           </div>
-          <button
-            onClick={() => {
-              console.log(currentLevels.length);
-            }}
-          >
-            asdasd
-          </button>
+          {currentLevels.length == 0 && (
+            <div>
+              <p>Няма резултати</p>
+            </div>
+          )}
+
           {currentLevels.length > 0 ? (
             <Pagination>
               <PaginationContent className="cursor-pointer">

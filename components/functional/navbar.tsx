@@ -114,6 +114,7 @@ export const Navbar = () => {
           dateOfRegistration: serverTimestamp(),
           badges: [],
           levels: [],
+          likedLevels: [],
         };
 
         await setDoc(userDocRef, userData);
