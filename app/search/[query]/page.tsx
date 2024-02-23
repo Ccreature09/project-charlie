@@ -33,18 +33,18 @@ export default function Page({ params }: { params: { query: string } }) {
   useEffect(() => {
     const fetchResults = async () => {
       if (slug) {
-        const searchQuery = decodeURIComponent(slug).toLowerCase(); // Convert query to lowercase
+        const searchQuery = decodeURIComponent(slug).toLowerCase();
 
         const levelQuery = query(
           collection(db, "levels"),
-          where("lowercaseName", ">=", searchQuery), // Assuming "nameLowerCase" is the lowercase version of "name"
-          where("lowercaseName", "<=", searchQuery + "\uf8ff")
+          where("lowercaseName", ">=", searchQuery.toLowerCase()),
+          where("lowercaseName", "<=", searchQuery.toLowerCase() + "\uf8ff")
         );
 
         const userQuery = query(
           collection(db, "users"),
-          where("lowercaseUsername", ">=", searchQuery), // Assuming "usernameLowerCase" is the lowercase version of "username"
-          where("lowercaseUsername", "<=", searchQuery + "\uf8ff")
+          where("lowercaseUsername", ">=", searchQuery.toLowerCase()),
+          where("lowercaseUsername", "<=", searchQuery.toLowerCase() + "\uf8ff")
         );
 
         try {
@@ -171,7 +171,7 @@ export default function Page({ params }: { params: { query: string } }) {
               </div>
             ))}
           </div>
-          {currentLevels.length == 0 && (
+          {currentLevels.length === 0 && currentUserProfiles.length === 0 && (
             <div>
               <p>Няма резултати</p>
             </div>
