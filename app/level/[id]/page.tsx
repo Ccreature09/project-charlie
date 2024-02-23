@@ -312,7 +312,7 @@ export default function Page({ params }: { params: { id: string } }) {
                   </div>
 
                   <div className="flex flex-wrap h-[10%] w-full  justify-center md:justify-between md:mr-5 bg-white bg-opacity-15 p-5 gap-4">
-                    {packName && previousLevelId && (
+                    {packName && previousLevelId != null && (
                       <Link
                         href={`/${
                           previousLevelId == -1 ? "level-packs" : "level"
@@ -406,7 +406,7 @@ export default function Page({ params }: { params: { id: string } }) {
                       </svg>
                       Цял екран
                     </Button>
-                    {packName && nextLevelId && (
+                    {packName && nextLevelId != null && (
                       <Link
                         href={`/${
                           nextLevelId == -1 ? "level-packs" : "level"
@@ -491,7 +491,7 @@ export default function Page({ params }: { params: { id: string } }) {
                 </div>
 
                 <div className="flex flex-wrap h-[10%] w-full  justify-center md:justify-between md:mr-5 bg-white bg-opacity-15 p-5 gap-4">
-                  {packName && previousLevelId && (
+                  {packName && previousLevelId != null && (
                     <Link
                       href={`/${
                         previousLevelId == -1 ? "level-packs" : "level"
@@ -583,7 +583,7 @@ export default function Page({ params }: { params: { id: string } }) {
                     </svg>
                     Цял екран
                   </Button>
-                  {packName && nextLevelId && (
+                  {packName && nextLevelId != null && (
                     <Link
                       href={`/${nextLevelId == -1 ? "level-packs" : "level"}/${
                         nextLevelId == -1 ? packName : nextLevelId
