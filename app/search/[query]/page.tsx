@@ -97,12 +97,6 @@ export default function Page({ params }: { params: { query: string } }) {
           <p className="text-3xl text-white mb-16">
             Резултати за <span className="font-semibold ">{slug}</span>:
           </p>
-          <div>
-            <p>Hello world</p>
-            <div>
-              <div></div>
-            </div>
-          </div>
 
           <div className="mb-5 lg:m-10">
             {currentUserProfiles.map((user) => (

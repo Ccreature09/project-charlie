@@ -18,6 +18,7 @@ import "react-quill/dist/quill.snow.css";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -34,6 +35,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [nextLevelId, setNextLevelId] = useState<number>();
   const [requestFullscreen, setRequestFullscreen] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const router = useRouter();
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -129,10 +131,11 @@ export default function Page({ params }: { params: { id: string } }) {
               const levelData = levelDoc.data() as Level;
               setLevel(levelData);
             } else {
-              console.error("Product not found");
+              console.error("Level not found");
+              router.push("/discover");
             }
           } catch (error) {
-            console.error("Error fetching product data:", error);
+            console.error("Error fetching level data:", error);
           }
         }
       }
