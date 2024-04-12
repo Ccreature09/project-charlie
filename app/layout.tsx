@@ -20,6 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head></head>
       <body className={Intro.className}>{children}</body>
     </html>
   );

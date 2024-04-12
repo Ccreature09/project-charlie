@@ -9,15 +9,9 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import UserForm from "./signIn";
+import UserForm, { handleGoogleSignIn } from "./signIn";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  signInWithPopup,
-  User,
-  GoogleAuthProvider,
-  signOut,
-  onAuthStateChanged,
-} from "firebase/auth";
+import { User, signOut, onAuthStateChanged } from "firebase/auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,16 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
-import {
-  setDoc,
-  serverTimestamp,
-  doc,
-  query,
-  collection,
-  where,
-  getDocs,
-} from "firebase/firestore";
-import { db } from "@/firebase/firebase";
+
 import {
   Drawer,
   DrawerContent,
@@ -62,7 +47,6 @@ import { Input } from "../ui/input";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-const provider = new GoogleAuthProvider();
 const adminArray = [
   "qAYbbta2AgRfev9NTEbMUqL1r212",
   "XsbxDDcsqwdDtKfN2xXETX9lCID2",
@@ -95,40 +79,6 @@ export const Navbar = () => {
       }
     });
   }, []);
-
-  const handleGoogleSignIn = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      const userDocRef = doc(db, "users", user.uid);
-      const querySnapshot = await query(
-        collection(db, "users"),
-        where("uid", "==", user.uid)
-      );
-      const queryData = await getDocs(querySnapshot);
-
-      if (queryData.empty) {
-        const userData = {
-          uid: user.uid,
-          pfp: user.photoURL,
-          username: user.displayName || "",
-          lowercaseUsername: user.displayName?.toLowerCase(),
-          dateOfRegistration: serverTimestamp(),
-          badges: [],
-          levels: [],
-          likedLevels: [],
-          completedLevels: [],
-        };
-
-        await setDoc(userDocRef, userData);
-      }
-
-      setUser(user);
-    } catch (error) {
-      console.error("Google sign-in failed:", error);
-    }
-  };
 
   const handleSignOut = async () => {
     try {

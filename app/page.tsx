@@ -1,6 +1,7 @@
 "use client";
 import { Navbar } from "@/components/functional/navbar";
 import { Button } from "@/components/ui/button";
+import OneSignal from "react-onesignal";
 import {
   Card,
   CardContent,
@@ -31,6 +32,19 @@ export default function Home() {
       });
     }
   };
+
+  useEffect(() => {
+    async function runOneSignal() {
+      await OneSignal.init({
+        appId: "01016387-bf8a-44e8-b919-2fcbeb9439c5",
+        allowLocalhostAsSecureOrigin: true,
+      });
+      console.log("SERVICEEE");
+      OneSignal.Slidedown.promptPush();
+    }
+
+    runOneSignal();
+  }, []);
   return (
     <>
       <div className="h-screen flex-row bg-cover min-h-[400vh]  md:min-h-[250vh] lg:min-h-[300vh]  scroll-smooth bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')]">

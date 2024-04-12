@@ -1,9 +1,20 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
 } from "firebase/auth";
 import { auth } from "@/firebase/firebase";
-
+import {
+  setDoc,
+  serverTimestamp,
+  doc,
+  query,
+  collection,
+  where,
+  getDocs,
+} from "firebase/firestore";
+import { db } from "@/firebase/firebase";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -27,6 +38,39 @@ const formSchema = z.object({
   }),
   password: z.string().min(6),
 });
+const provider = new GoogleAuthProvider();
+
+export const handleGoogleSignIn = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    const userDocRef = doc(db, "users", user.uid);
+    const querySnapshot = await query(
+      collection(db, "users"),
+      where("uid", "==", user.uid)
+    );
+    const queryData = await getDocs(querySnapshot);
+
+    if (queryData.empty) {
+      const userData = {
+        uid: user.uid,
+        pfp: user.photoURL,
+        username: user.displayName || "",
+        lowercaseUsername: user.displayName?.toLowerCase(),
+        dateOfRegistration: serverTimestamp(),
+        badges: [],
+        levels: [],
+        likedLevels: [],
+        completedLevels: [],
+      };
+
+      await setDoc(userDocRef, userData);
+    }
+  } catch (error) {
+    console.error("Google sign-in failed:", error);
+  }
+};
 
 export default function UserForm({ login }: UserFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,7 +88,30 @@ export default function UserForm({ login }: UserFormProps) {
 
   const handleSignIn = async (email: string, password: string) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      const user = result.user;
+      const userDocRef = doc(db, "users", user.uid);
+      const querySnapshot = await query(
+        collection(db, "users"),
+        where("uid", "==", user.uid)
+      );
+      const queryData = await getDocs(querySnapshot);
+
+      if (queryData.empty) {
+        const userData = {
+          uid: user.uid,
+          pfp: user.photoURL,
+          username: user.displayName || "",
+          lowercaseUsername: user.displayName?.toLowerCase(),
+          dateOfRegistration: serverTimestamp(),
+          badges: [],
+          levels: [],
+          likedLevels: [],
+          completedLevels: [],
+        };
+
+        await setDoc(userDocRef, userData);
+      }
     } catch (error) {
       console.error("Sign-in failed:", error);
     }
@@ -52,7 +119,35 @@ export default function UserForm({ login }: UserFormProps) {
 
   const handleSignUp = async (email: string, password: string) => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const result = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = result.user;
+
+      const userDocRef = doc(db, "users", user.uid);
+      const querySnapshot = await query(
+        collection(db, "users"),
+        where("uid", "==", user.uid)
+      );
+      const queryData = await getDocs(querySnapshot);
+
+      if (queryData.empty) {
+        const userData = {
+          uid: user.uid,
+          pfp: user.photoURL || "",
+          username: user.displayName || "User",
+          lowercaseUsername: user.displayName?.toLowerCase() || "user",
+          dateOfRegistration: serverTimestamp(),
+          badges: [],
+          levels: [],
+          likedLevels: [],
+          completedLevels: [],
+        };
+
+        await setDoc(userDocRef, userData);
+      }
     } catch (error) {
       console.error("Sign-up failed:", error);
     }
