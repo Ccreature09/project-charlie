@@ -23,6 +23,10 @@ module.exports = withPWA({
         protocol: "https",
         hostname: "img.itch.zone",
       },
+      {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+      },
     ],
   },
 });
