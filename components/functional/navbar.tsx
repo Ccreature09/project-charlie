@@ -98,8 +98,8 @@ export const Navbar = () => {
             <Link href={"/"}>
               <Image
                 src="https://i.ibb.co/RCkLHNs/Logo-1-ai-brush-removebg-qztjehsw.png"
-                width={100}
-                height={100}
+                width={90}
+                height={90}
                 alt="Logo"
               />
             </Link>
@@ -381,13 +381,13 @@ export const Navbar = () => {
                   <svg
                     data-testid="geist-icon"
                     height="30"
-                    stroke-linejoin="round"
+                    strokeLinejoin="round"
                     viewBox="0 0 16 16"
                     width="30"
                   >
                     <path
                       fill-rule="evenodd"
-                      clip-rule="evenodd"
+                      clipRule="evenodd"
                       d="M7.75 0C5.95507 0 4.5 1.45507 4.5 3.25V3.75C4.5 5.54493 5.95507 7 7.75 7H8.25C10.0449 7 11.5 5.54493 11.5 3.75V3.25C11.5 1.45507 10.0449 0 8.25 0H7.75ZM6 3.25C6 2.2835 6.7835 1.5 7.75 1.5H8.25C9.2165 1.5 10 2.2835 10 3.25V3.75C10 4.7165 9.2165 5.5 8.25 5.5H7.75C6.7835 5.5 6 4.7165 6 3.75V3.25ZM2.5 14.5V13.1709C3.31958 11.5377 4.99308 10.5 6.82945 10.5H9.17055C11.0069 10.5 12.6804 11.5377 13.5 13.1709V14.5H2.5ZM6.82945 9C4.35483 9 2.10604 10.4388 1.06903 12.6857L1 12.8353V13V15.25V16H1.75H14.25H15V15.25V13V12.8353L14.931 12.6857C13.894 10.4388 11.6452 9 9.17055 9H6.82945Z"
                       fill="currentColor"
                     ></path>
@@ -405,15 +405,33 @@ export const Navbar = () => {
                     <h1 className=" text-center mb-8 font-bold text-2xl">
                       Вход / Регистрация
                     </h1>
+                    <Separator className="mb-5" />
+
                     <Button
-                      className="w-full mb-5"
+                      className="w-full mb-5 bg-green-500 flex text-white  "
                       onClick={handleGoogleSignIn}
                     >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="mx-3"
+                      >
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                      </svg>
                       Вход с Google
                     </Button>
-                    <UserForm login />
-                    <Separator className="mb-5" />
-                    <UserForm login={false} />
+
+                    <UserForm login mobile={false} />
+                    <UserForm login={false} mobile={false} />
                   </>
                 ) : (
                   <>
@@ -476,9 +494,9 @@ export const Navbar = () => {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="mx-3"
                     >
                       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -487,26 +505,29 @@ export const Navbar = () => {
                     Начална Страница
                   </DropdownMenuItem>
                 </Link>
-                <Link href={`/profile/${user?.uid}`}>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      className="mx-3"
-                    >
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    Профил
-                  </DropdownMenuItem>
-                </Link>
+                {user && (
+                  <Link href={`/profile/${user?.uid}`}>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="mx-3"
+                      >
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                      Профил
+                    </DropdownMenuItem>
+                  </Link>
+                )}
+
                 <Link href="/level-creator">
                   <DropdownMenuItem className="cursor-pointer">
                     <svg
@@ -516,9 +537,9 @@ export const Navbar = () => {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="mx-3"
                     >
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -538,9 +559,9 @@ export const Navbar = () => {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="mx-3"
                     >
                       <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
@@ -557,9 +578,9 @@ export const Navbar = () => {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="mx-3"
                     >
                       <circle cx="11" cy="11" r="8"></circle>
@@ -570,28 +591,33 @@ export const Navbar = () => {
                 </Link>
                 <DropdownMenuSeparator />
                 {!user ? (
-                  <DropdownMenuItem
-                    onClick={handleGoogleSignIn}
-                    className="cursor-pointer text-green-500 "
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mx-3"
+                  <>
+                    <DropdownMenuItem
+                      onClick={handleGoogleSignIn}
+                      className="cursor-pointer text-green-500 "
                     >
-                      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                      <polyline points="10 17 15 12 10 7"></polyline>
-                      <line x1="15" y1="12" x2="3" y2="12"></line>
-                    </svg>
-                    Вход
-                  </DropdownMenuItem>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="mx-3"
+                      >
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                      </svg>
+                      Вход с Google
+                    </DropdownMenuItem>
+
+                    <UserForm login mobile />
+                    <UserForm login={false} mobile />
+                  </>
                 ) : (
                   <DropdownMenuItem
                     onClick={handleSignOut}
