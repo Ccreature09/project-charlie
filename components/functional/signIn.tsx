@@ -42,7 +42,7 @@ const formSchema = z.object({
   }),
   password: z.string().min(6),
   username: z.string().min(3),
-  photo: z.instanceof(File).optional(),
+  // photo: z.instanceof(File).optional(),
 });
 const provider = new GoogleAuthProvider();
 
@@ -87,7 +87,7 @@ export default function UserForm({ login, mobile }: UserFormProps) {
       email: "",
       password: "",
       username: "",
-      photo: undefined,
+      //   photo: undefined,
     },
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -96,8 +96,8 @@ export default function UserForm({ login, mobile }: UserFormProps) {
       : handleSignUp(
           values.email,
           values.password,
-          values.username,
-          values.photo
+          values.username
+          //     values.photo
         );
   }
 
@@ -135,8 +135,8 @@ export default function UserForm({ login, mobile }: UserFormProps) {
   const handleSignUp = async (
     email: string,
     password: string,
-    username: string,
-    photo: File | undefined
+    username: string
+    //  photo: File | undefined
   ) => {
     try {
       const result = await createUserWithEmailAndPassword(
@@ -146,11 +146,11 @@ export default function UserForm({ login, mobile }: UserFormProps) {
       );
       const user = result.user;
       let photoURL = "";
-      if (photo) {
-        const storageRef = ref(storage, `users/${user.uid}/profile.jpg`);
-        await uploadBytes(storageRef, photo);
-        photoURL = await getDownloadURL(storageRef);
-      }
+      // if (photo) {
+      //   const storageRef = ref(storage, `users/${user.uid}/profile.jpg`);
+      //   await uploadBytes(storageRef, photo);
+      //   photoURL = await getDownloadURL(storageRef);
+      // }
 
       const userDocRef = doc(db, "users", user.uid);
       const querySnapshot = await query(
@@ -275,7 +275,7 @@ export default function UserForm({ login, mobile }: UserFormProps) {
                     )}
                   />
 
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="photo"
                     render={({ field }) => (
@@ -297,7 +297,7 @@ export default function UserForm({ login, mobile }: UserFormProps) {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                 </div>
               )}
               {!login && (
