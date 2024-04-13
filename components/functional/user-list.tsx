@@ -20,11 +20,15 @@ import { useRouter } from "next/navigation";
 import { Timestamp, collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import Link from "next/link";
+
 export default function UserList() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [mount, setMount] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -56,43 +60,61 @@ export default function UserList() {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentUsers = users.slice(indexOfFirstItem, indexOfLastItem);
 
-  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const filteredUsers = users.filter((user) => {
+    return (
+      user.uid.includes(searchTerm) ||
+      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.dateOfRegistration instanceof Timestamp &&
+        user.dateOfRegistration
+          .toDate()
+          .toLocaleDateString()
+          .includes(searchTerm))
+    );
+  });
+
+  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
   return (
     <>
       {mount && (
         <div>
+          <Input
+            type="text"
+            className="mb-10 w-1/2 flex mx-auto"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
           <Table className="mb-5">
             <TableHeader>
               <TableRow>
                 <TableHead className="text-center text-white">
-                  Потребителски UID
+                  User UID
                 </TableHead>
                 <TableHead className="text-center text-white">
-                  Профилна Снимка
+                  Profile Picture
                 </TableHead>
                 <TableHead className="text-center text-white">
-                  Потребителско Име
+                  Username
                 </TableHead>
                 <TableHead className="text-center text-white">
-                  Дата на Регистрация
+                  Date of Registration
                 </TableHead>
-
                 <TableHead className="text-center text-white">
-                  Действия
+                  Actions
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="text-white">
+            <TableBody>
               {currentUsers.map((user) => (
                 <TableRow key={user.uid}>
                   <TableCell>{user.uid}</TableCell>
                   <TableCell>
                     <img src={user.pfp} alt="" />
                   </TableCell>
-
                   <TableCell>{user.username}</TableCell>
                   <TableCell>
                     {user.dateOfRegistration instanceof Timestamp
@@ -100,13 +122,9 @@ export default function UserList() {
                       : ""}
                   </TableCell>
                   <TableCell>
-                    {/* Actions column */}
-                    {/* Visit user Button */}
-                    <Button onClick={() => handleVisituser(user.uid)}>
-                      Visit user
-                    </Button>
-                    {/* Warn user Button */}
-
+                    <Link className="mb-3 flex" href={`/profile/${user.uid}`}>
+                      <Button>Visit user</Button>
+                    </Link>
                     <Button onClick={() => handleDeleteuser(user.uid)}>
                       Ban User
                     </Button>
@@ -116,14 +134,13 @@ export default function UserList() {
             </TableBody>
           </Table>
           <Pagination>
-            <PaginationContent className="cursor-pointer">
+            <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
                   className={`${currentPage === 1 && "hidden"}`}
                   onClick={() => setCurrentPage(currentPage - 1)}
                 />
               </PaginationItem>
-              {/* Generate pagination links dynamically */}
               {[...Array(totalPages)].map((_, index) => (
                 <PaginationItem key={index}>
                   <PaginationLink
