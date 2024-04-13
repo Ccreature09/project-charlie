@@ -7,7 +7,14 @@ import {
   getDocs,
   updateDoc,
   doc,
+  Timestamp,
 } from "firebase/firestore";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import React, { useState, useEffect } from "react";
 import { User as UserData, Level } from "@/interfaces";
 import { User } from "firebase/auth";
@@ -25,6 +32,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [slug, setSlug] = useState(params.id);
   const [level, setLevel] = useState<Level>();
   const [user, setUser] = useState<User | null>();
+  const [author, setAuthor] = useState<UserData>();
   const [userData, setUserData] = useState<UserData>();
   const [packLevels, setPackLevels] = useState<number[]>([]);
   const [packName, setPackName] = useState("");
@@ -191,6 +199,24 @@ export default function Page({ params }: { params: { id: string } }) {
     fetchLikes();
   }, [level]);
 
+  useEffect(() => {
+    const fetchAuthorData = async () => {
+      if (level?.author) {
+        const userQuery = query(
+          collection(db, "users"),
+          where("uid", "==", level.authorUID)
+        );
+        const userQuerySnapshot = await getDocs(userQuery);
+        if (!userQuerySnapshot.empty) {
+          const authorData = userQuerySnapshot.docs[0].data() as UserData;
+          setAuthor(authorData);
+        }
+      }
+    };
+
+    fetchAuthorData();
+  }, [level?.author]);
+
   const handleLikeClick = async () => {
     try {
       if (!level || !user) {
@@ -264,8 +290,42 @@ export default function Page({ params }: { params: { id: string } }) {
                   <p className="text-4xl font-bold text-center mt-5 ">
                     {level?.name}
                   </p>
+
                   <p className="text-2xl font-semibold text-center">
-                    <span className="text-gray-700">От</span> {level?.author}
+                    <span className="text-gray-700">От </span>
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Link href={`/profile/${level?.authorUID}`}>
+                          <Button className="text-3xl" variant="link">
+                            @{level?.author}
+                          </Button>
+                        </Link>
+                      </HoverCardTrigger>
+                      <HoverCardContent className="">
+                        <div className="flex">
+                          <Avatar className="flex mx-5">
+                            <AvatarImage src={author?.pfp || ""} />
+                            <AvatarFallback>{level?.author}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h4 className="text-md font-semibold">
+                              @{level?.author}
+                            </h4>
+
+                            <div className="flex items-center ">
+                              <span className="text-xs text-muted-foreground">
+                                Joined{" "}
+                                {author?.dateOfRegistration instanceof Timestamp
+                                  ? author.dateOfRegistration
+                                      .toDate()
+                                      .toLocaleDateString()
+                                  : ""}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </p>
                   <div className="mx-10 my-3 flex">
                     {(level &&
@@ -447,8 +507,42 @@ export default function Page({ params }: { params: { id: string } }) {
                   {level?.name}
                 </p>
                 <p className="text-2xl font-semibold text-center">
-                  <span className="text-gray-700">От</span> {level?.author}
+                  <span className="text-gray-700">От </span>
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <Link href={`/profile/${level?.authorUID}`}>
+                        <Button className="text-3xl" variant="link">
+                          @{level?.author}
+                        </Button>
+                      </Link>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="">
+                      <div className="flex">
+                        <Avatar className="flex mx-5">
+                          <AvatarImage src={author?.pfp || ""} />
+                          <AvatarFallback>{level?.author}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h4 className="text-md font-semibold">
+                            @{level?.author}
+                          </h4>
+
+                          <div className="flex items-center ">
+                            <span className="text-xs text-muted-foreground">
+                              Joined{" "}
+                              {author?.dateOfRegistration instanceof Timestamp
+                                ? author.dateOfRegistration
+                                    .toDate()
+                                    .toLocaleDateString()
+                                : ""}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
                 </p>
+
                 <div className="mx-10 my-3 flex">
                   {(level &&
                     userData &&
