@@ -29,7 +29,7 @@ export default function Page() {
     <>
       <div className="h-screen bg-cover min-h-screen 2xl:min-h-[130vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] ">
         <Navbar />
-        <div className="container mx-auto p-4 flex flex-col">
+        <div className="container  p-4 flex flex-col">
           <Tabs defaultValue="levels" className="w-full mx-auto">
             <TabsList className="w-full mb-5 flex flex-row">
               <TabsTrigger value="levels">Levels</TabsTrigger>
@@ -43,10 +43,8 @@ export default function Page() {
                   </div>
                 </TabsContent>
                 <TabsContent value="users">
-                  <div className="flex ">
-                    <div className="flex mx-auto">
-                      <UserList></UserList>
-                    </div>
+                  <div className="flex justify-center ">
+                    <UserList></UserList>
                   </div>
                 </TabsContent>
               </div>
