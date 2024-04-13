@@ -344,9 +344,9 @@ export default function Page() {
                     >
                       Вход с Google
                     </Button>
-                    <UserForm login />
+                    <UserForm login mobile={true} />
                     <Separator className="mb-5" />
-                    <UserForm login={false} />
+                    <UserForm login={false} mobile={true} />
                   </PopoverContent>
                 </Popover>
               </AlertDialogFooter>
@@ -570,9 +570,9 @@ export default function Page() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                         className="mr-3"
                       >
                         <rect
@@ -600,9 +600,9 @@ export default function Page() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                         className="mr-3"
                       >
                         <rect
@@ -832,9 +832,9 @@ export default function Page() {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="mr-3"
                     >
                       <rect
@@ -862,9 +862,9 @@ export default function Page() {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       className="mr-3"
                     >
                       <rect
