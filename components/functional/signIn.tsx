@@ -34,6 +34,7 @@ import { ref, uploadBytes, getDownloadURL, getStorage } from "firebase/storage";
 const storage = getStorage();
 interface UserFormProps {
   login: boolean;
+  mobile: boolean;
 }
 const formSchema = z.object({
   email: z.string().email({
@@ -77,7 +78,7 @@ export const handleGoogleSignIn = async () => {
   }
 };
 
-export default function UserForm({ login }: UserFormProps) {
+export default function UserForm({ login, mobile }: UserFormProps) {
   const [step, setStep] = useState(1);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -181,8 +182,27 @@ export default function UserForm({ login }: UserFormProps) {
   return (
     <>
       <Dialog>
-        <DialogTrigger className="dark:bg-white mb-5 dark:text-black text-sm text-white bg-slate-900 dark:hover:bg-slate-50/90 hover:bg-slate-900/90 w-full py-2 rounded-md">
-          {login ? "Вход с имейл и парола" : "Регистрация с имейл и парола"}
+        <DialogTrigger
+          className={`bg-white text-sm   hover:bg-slate-50/90 ${
+            mobile ? "py-1 ml-2 justify-start" : "py-3 justify-center"
+          } text-black flex w-full rounded-md`}
+        >
+          <svg
+            data-testid="geist-icon"
+            height="24"
+            strokeLinejoin="round"
+            viewBox="0 0 16 16"
+            width="24"
+            className="mx-3"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M13.5 2.5L9.25 2.5V1H14C14.5523 1 15 1.44771 15 2L15 14C15 14.5523 14.5523 15 14 15H9.25V13.5H13.5L13.5 2.5ZM8.43934 7.24999L6.46967 5.28031L5.93934 4.74998L7 3.68932L7.53033 4.21965L10.6036 7.29288C10.9941 7.6834 10.9941 8.31657 10.6036 8.70709L7.53033 11.7803L7 12.3106L5.93934 11.25L6.46967 10.7197L8.43934 8.74999L1.75 8.74999H1V7.24999H1.75L8.43934 7.24999Z"
+              fill="currentColor"
+            ></path>
+          </svg>
+          {login ? "Вход с имейл" : "Регистрация с имейл"}
         </DialogTrigger>
 
         <DialogContent>
@@ -193,12 +213,12 @@ export default function UserForm({ login }: UserFormProps) {
 
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {step == 1 && (
-                <div className="flex flex-row gap-3 ">
+                <div className="flex flex-col gap-3 ">
                   <FormField
                     control={form.control}
                     name="email"
                     render={({ field }) => (
-                      <FormItem className="w-1/2">
+                      <FormItem className="w-full">
                         <FormLabel>Имейл</FormLabel>
                         <FormControl>
                           <Input
@@ -216,7 +236,7 @@ export default function UserForm({ login }: UserFormProps) {
                     control={form.control}
                     name="password"
                     render={({ field }) => (
-                      <FormItem className="w-1/2">
+                      <FormItem className="w-full">
                         <FormLabel>Парола</FormLabel>
                         <FormControl>
                           <Input
@@ -235,12 +255,12 @@ export default function UserForm({ login }: UserFormProps) {
               )}
 
               {step == 2 && (
-                <div className="flex flex-row gap-3 ">
+                <div className="flex flex-col gap-3 ">
                   <FormField
                     control={form.control}
                     name="username"
                     render={({ field }) => (
-                      <FormItem className="w-1/2">
+                      <FormItem className="w-full">
                         <FormLabel>Име</FormLabel>
                         <FormControl>
                           <Input
@@ -259,7 +279,7 @@ export default function UserForm({ login }: UserFormProps) {
                     control={form.control}
                     name="photo"
                     render={({ field }) => (
-                      <FormItem className="w-1/2">
+                      <FormItem className="w-full">
                         <FormLabel>Снимка</FormLabel>
                         <FormControl>
                           <Input
