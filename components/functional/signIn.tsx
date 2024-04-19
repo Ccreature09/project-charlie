@@ -5,7 +5,6 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { auth } from "@/firebase/firebase";
 import { useState } from "react";
 import {
   setDoc,
@@ -16,7 +15,7 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
-import { db } from "@/firebase/firebase";
+import { db, storage, auth } from "@/firebase/firebase";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -31,8 +30,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { ref, uploadBytes, getDownloadURL, getStorage } from "firebase/storage";
-const storage = getStorage();
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 interface UserFormProps {
   login: boolean;
   mobile: boolean;

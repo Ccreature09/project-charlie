@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const Intro = localFont({
@@ -21,7 +21,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head></head>
-      <body className={Intro.className}>{children}</body>
+      <body className={Intro.className}>
+        {children}
+        <Analytics></Analytics>
+      </body>
     </html>
   );
 }
