@@ -41,7 +41,7 @@ const formSchema = z.object({
   }),
   password: z.string().min(6),
   username: z.string().min(3),
-  photo: z.instanceof(File).optional(),
+  photo: z.instanceof(File),
 });
 const provider = new GoogleAuthProvider();
 
@@ -86,7 +86,6 @@ export default function UserForm({ login, mobile }: UserFormProps) {
       email: "",
       password: "",
       username: "",
-      photo: undefined,
     },
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -135,7 +134,7 @@ export default function UserForm({ login, mobile }: UserFormProps) {
     email: string,
     password: string,
     username: string,
-    photo: File | undefined
+    photo: File
   ) => {
     try {
       const result = await createUserWithEmailAndPassword(
