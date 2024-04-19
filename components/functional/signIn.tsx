@@ -41,7 +41,6 @@ const formSchema = z.object({
   }),
   password: z.string().min(6),
   username: z.string().min(3),
-  photo: z.instanceof(File),
 });
 const provider = new GoogleAuthProvider();
 
@@ -79,6 +78,7 @@ export const handleGoogleSignIn = async () => {
 
 export default function UserForm({ login, mobile }: UserFormProps) {
   const [step, setStep] = useState(1);
+  const [photo, setPhoto] = useState<File | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -91,12 +91,7 @@ export default function UserForm({ login, mobile }: UserFormProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     login
       ? handleSignIn(values.email, values.password)
-      : handleSignUp(
-          values.email,
-          values.password,
-          values.username,
-          values.photo
-        );
+      : handleSignUp(values.email, values.password, values.username, photo);
   }
 
   const handleSignIn = async (email: string, password: string) => {
@@ -134,7 +129,7 @@ export default function UserForm({ login, mobile }: UserFormProps) {
     email: string,
     password: string,
     username: string,
-    photo: File
+    photo: File | null
   ) => {
     try {
       const result = await createUserWithEmailAndPassword(
@@ -273,29 +268,20 @@ export default function UserForm({ login, mobile }: UserFormProps) {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="photo"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel>Снимка</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) =>
-                              e.target.files &&
-                              field.onChange(e.target.files[0])
-                            }
-                            onBlur={field.onBlur}
-                            className="w-full p-2 rounded border"
-                          />
-                        </FormControl>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="w-full">
+                    <FormLabel>Снимка</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          e.target.files && setPhoto(e.target.files[0]);
+                        }}
+                        className="w-full p-2 rounded border"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </div>
                 </div>
               )}
               {!login && (
