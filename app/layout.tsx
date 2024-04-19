@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const Intro = localFont({
@@ -23,6 +24,7 @@ export default function RootLayout({
       <head></head>
       <body className={Intro.className}>
         {children}
+        <SpeedInsights></SpeedInsights>
         <Analytics></Analytics>
       </body>
     </html>
