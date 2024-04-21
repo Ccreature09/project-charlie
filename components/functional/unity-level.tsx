@@ -27,6 +27,7 @@ export default function UnityLevelEmbed({
     frameworkUrl: "/build/level/unity.framework.js",
     codeUrl: "/build/level/unity.wasm",
   });
+
   useEffect(() => {
     requestFullscreen(true);
   }, [onFullscreen]);
@@ -42,11 +43,12 @@ export default function UnityLevelEmbed({
   }, []);
 
   useEffect(() => {
-    addEventListener("SendData", FetchData);
+    isLoaded && addEventListener("SendData", FetchData);
+
     return () => {
       removeEventListener("SendData", FetchData);
     };
-  }, [addEventListener, removeEventListener, FetchData]);
+  }, [addEventListener, removeEventListener, FetchData, isLoaded]);
 
   function SendData() {
     const combinedData = `//LEVEL_NAME:${level?.name}//AUTHOR_NAME:${level?.author}//SEED:${level?.seed}///`;
