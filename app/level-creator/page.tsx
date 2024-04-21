@@ -19,6 +19,7 @@ import {
   setDoc,
   updateDoc,
   DocumentReference,
+  getDoc,
 } from "firebase/firestore";
 import {
   AlertDialog,
@@ -91,7 +92,6 @@ export default function Page() {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [levelCount, setLevelCount] = useState(0);
   const [user, setUser] = useState<User | null>(null);
-  const [userData, setUserData] = useState<UserData>();
   const levelsCollectionRef = collection(db, "levels");
   const [signInPopup, setsignInPopup] = useState(false);
   const [seed, setSeed] = useState("");
@@ -110,7 +110,7 @@ export default function Page() {
       const user = result.user;
 
       const userDocRef = doc(db, "users", user.uid);
-      const querySnapshot = await query(
+      const querySnapshot = query(
         collection(db, "users"),
         where("uid", "==", user.uid)
       );
@@ -149,7 +149,6 @@ export default function Page() {
         const userSnapshot = await getDocs(userQuery);
         if (!userSnapshot.empty) {
           const userData = userSnapshot.docs[0].data() as UserData;
-          setUserData(userData);
           if (userData.draftLevel) {
             setNewLevel(userData.draftLevel);
 
@@ -215,24 +214,40 @@ export default function Page() {
         const newLevelData = {
           ...newLevel,
           lowercaseName: newLevel.name.toLowerCase(),
-          seed: seed,
+          seed: newLevel.seed,
           grid: `${width}x${height}`,
           id: levelCount,
-          author: user?.displayName,
-          authorUID: user?.uid,
-          pfp: user?.photoURL,
           publishDate: serverTimestamp(),
         };
-        await addDoc(levelsCollectionRef, newLevelData);
+
+        if (user) {
+          const userDocRef = doc(db, "users", user.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            newLevelData.author = userData.username || user?.displayName || "";
+            newLevelData.authorUID = userData.uid || user?.uid || "";
+            newLevelData.pfp = userData.pfp || user?.photoURL || "";
+          }
+          await addDoc(levelsCollectionRef, newLevelData);
+        }
 
         setError("");
         setThumbnail("");
+        setWidth(4);
         setWidth(3);
         setHeight(3);
         setSeed("");
         setNewLevel(initialLevelState);
       } else {
-        setError("Invalid Data");
+        !newLevel.name
+          ? setError("Моля въведете име на нивото.")
+          : !newLevel.seed
+          ? setError("Моля верифицирайте нивото (минете го).")
+          : !newLevel.imgURL
+          ? setError("Моля направете снимка на нивото.")
+          : !newLevel.difficulty &&
+            setError("Моля въведете трудност на нивото");
       }
     } catch (error) {
       console.error("Error creating level:", error);
@@ -427,7 +442,7 @@ export default function Page() {
                           </div>
                         </div>
                       </div>
-                      <p className="text-red-500">{error}</p>
+                      <p className="text-red-500 text-center mt-5">{error}</p>
 
                       <Button
                         onClick={() => {
@@ -440,10 +455,19 @@ export default function Page() {
                             handleSubmit();
                             resetDraftLevel();
                           } else {
-                            setError("Invalid Data");
+                            !newLevel.name
+                              ? setError("Моля въведете име на нивото.")
+                              : !newLevel.seed
+                              ? setError(
+                                  "Моля верифицирайте нивото (минете го)."
+                                )
+                              : !newLevel.imgURL
+                              ? setError("Моля направете снимка на нивото.")
+                              : !newLevel.difficulty &&
+                                setError("Моля въведете трудност на нивото");
                           }
                         }}
-                        className=" mx-auto flex w-full mt-10"
+                        className=" mx-auto flex w-full mt-2"
                       >
                         Публикувай
                       </Button>
@@ -628,6 +652,7 @@ export default function Page() {
                 <h2 className="text-2xl text-center font-bold mb-4">
                   Създай ниво
                 </h2>
+
                 <Tabs defaultValue="details">
                   <TabsList className="flex mx-auto w-full">
                     <TabsTrigger value="details">Детайли</TabsTrigger>
@@ -698,6 +723,8 @@ export default function Page() {
                         </div>
                       </div>
                     </div>
+                    <p className="text-red-500 text-center mt-5">{error}</p>
+
                     <Button
                       onClick={() => {
                         if (
@@ -709,10 +736,17 @@ export default function Page() {
                           handleSubmit();
                           resetDraftLevel();
                         } else {
-                          setError("Invalid Data");
+                          !newLevel.name
+                            ? setError("Моля въведете име на нивото.")
+                            : !newLevel.seed
+                            ? setError("Моля верифицирайте нивото (минете го).")
+                            : !newLevel.imgURL
+                            ? setError("Моля направете снимка на нивото.")
+                            : !newLevel.difficulty &&
+                              setError("Моля въведете трудност на нивото");
                         }
                       }}
-                      className=" mx-auto flex w-full mt-10"
+                      className=" mx-auto flex w-full mt-2"
                     >
                       Публикувай
                     </Button>
@@ -776,7 +810,6 @@ export default function Page() {
                     </div>
                   </TabsContent>
                 </Tabs>
-                <p className="text-red-500">{error}</p>
               </div>
               <div className="w-full lg:w-[67%]  flex flex-col mr-10">
                 <div>
