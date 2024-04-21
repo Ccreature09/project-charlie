@@ -50,10 +50,6 @@ export default function UserList() {
     FetchUsers();
   }, []);
 
-  const handleVisituser = (userId: string) => {
-    router.push(`/profile/${userId}`);
-  };
-
   const handleDeleteuser = (userId: string) => {
     alert(`Banning user ${userId}`);
   };
@@ -113,7 +109,7 @@ export default function UserList() {
                 <TableRow key={user.uid}>
                   <TableCell>{user.uid}</TableCell>
                   <TableCell>
-                    <img src={user.pfp} alt="" />
+                    <img src={user.pfp} className="w-32" alt="" />
                   </TableCell>
                   <TableCell>{user.username}</TableCell>
                   <TableCell>

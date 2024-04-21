@@ -354,7 +354,7 @@ export default function Page() {
                   </PopoverTrigger>
                   <PopoverContent>
                     <Button
-                      className="w-full mb-5"
+                      className="w-full mb-5 bg-green-500 flex text-white "
                       onClick={handleGoogleSignIn}
                     >
                       Вход с Google

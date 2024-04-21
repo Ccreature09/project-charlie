@@ -97,13 +97,12 @@ export default function Page({ params }: { params: { query: string } }) {
           <p className="text-3xl text-white mb-16">
             Резултати за <span className="font-semibold ">{slug}</span>:
           </p>
-
           <div className="mb-5 lg:m-10">
             {currentUserProfiles.map((user) => (
               <Link href={`/profile/${user.uid}`} className="" key={user.uid}>
                 <div className="bg-blue-100 flex rounded-lg  flex-col md:flex-row p-5 my-5">
                   <Image
-                    src={user.pfp || "default_profile_image_url"}
+                    src={user.pfp || "/default_profile_image_url"}
                     width={200}
                     height={200}
                     alt={user.username + " image"}
@@ -207,7 +206,7 @@ export default function Page({ params }: { params: { query: string } }) {
               </PaginationContent>
             </Pagination>
           ) : (
-            currentLevels.length > 0 && (
+            currentUserProfiles.length > 0 && (
               <Pagination>
                 <PaginationContent className="cursor-pointer">
                   <PaginationItem>
