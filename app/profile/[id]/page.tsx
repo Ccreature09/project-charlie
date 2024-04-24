@@ -249,7 +249,7 @@ export default function Page({ params }: { params: { id: string } }) {
                             href={`/level/${level.id}`}
                           >
                             <Button className="w-full lg: mr-6 lg:w-auto">
-                              Play
+                              Играй
                             </Button>
                           </Link>
                           {isAdmin && (

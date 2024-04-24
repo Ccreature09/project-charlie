@@ -67,13 +67,18 @@ export default function Page({ params }: { params: { id: string } }) {
             if (!userSnapshot.empty) {
               const userData = userSnapshot.docs[0].data() as UserData;
               const completedLevels = userData.completedLevels || [];
-              const updatedCompletedLevels = [...completedLevels, Number(slug)];
+              if (!completedLevels.includes(Number(slug))) {
+                const updatedCompletedLevels = [
+                  ...completedLevels,
+                  Number(slug),
+                ];
 
-              const userDocRef = doc(db, "users", userSnapshot.docs[0].id);
+                const userDocRef = doc(db, "users", userSnapshot.docs[0].id);
 
-              await updateDoc(userDocRef, {
-                completedLevels: updatedCompletedLevels,
-              });
+                await updateDoc(userDocRef, {
+                  completedLevels: updatedCompletedLevels,
+                });
+              }
             }
           }
         } catch (error) {
