@@ -6,6 +6,7 @@ import Link from "next/link";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import { db, auth } from "@/firebase/firebase";
 import { User, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { useToast } from "@/components/ui/use-toast";
 import { onAuthStateChanged } from "firebase/auth";
 import {
   addDoc,
@@ -94,6 +95,8 @@ export default function Page() {
   const [user, setUser] = useState<User | null>(null);
   const levelsCollectionRef = collection(db, "levels");
   const [signInPopup, setsignInPopup] = useState(false);
+  const [banPopup, setBanPopup] = useState(false);
+
   const [seed, setSeed] = useState("");
   const [finalSeed, setFinalSeed] = useState("");
   const [requestFullscreen, setRequestFullscreen] = useState(false);
@@ -101,7 +104,7 @@ export default function Page() {
   const [requestScreenshot, setRequestScreenshot] = useState(false);
   const [requestHideUI, setRequestHideUI] = useState(false);
   const [error, setError] = useState("");
-
+  const { toast } = useToast();
   const [thumbnail, setThumbnail] = useState<string>();
 
   const handleGoogleSignIn = async () => {
@@ -255,16 +258,35 @@ export default function Page() {
   };
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
         setsignInPopup(false);
+        setBanPopup(await checkUserBannedStatus(user.uid));
       } else {
         setUser(null);
         setsignInPopup(true);
       }
     });
+
+    return () => unsubscribe();
   }, []);
+
+  const checkUserBannedStatus = async (uid: string) => {
+    try {
+      const userDocRef = doc(db, "users", uid);
+      const userDocSnapshot = await getDoc(userDocRef);
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        return userData.isBanned || false;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Error checking user banned status:", error);
+      return false; // Return false in case of any error
+    }
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -290,6 +312,12 @@ export default function Page() {
           const userDocRef = doc(db, "users", userDoc.id);
           await setDoc(userDocRef, { draftLevel: newLevel }, { merge: true });
         }
+        () => {
+          toast({
+            title: "Level Saved...",
+            description: "",
+          });
+        };
       }
     } catch (error) {
       console.error("Error saving draft level:", error);
@@ -368,6 +396,24 @@ export default function Page() {
             </AlertDialogContent>
           </AlertDialog>
 
+          <AlertDialog open={banPopup}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Забранено ви е да създавате нива!
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Изчакайте администратор да ви върне достъпа
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <Link href={"/"}>
+                  <Button>Назад</Button>
+                </Link>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
           {isSmallScreen ? (
             <>
               <div className="mx-5 mb-5">
@@ -385,7 +431,14 @@ export default function Page() {
                       <div>
                         <p className=" text-2xl mb-2">Име:</p>
                         <Input
-                          onBlur={() => saveDraftLevelToFirestore()}
+                          onBlur={() => {
+                            saveDraftLevelToFirestore();
+
+                            toast({
+                              title: "Level Saved...",
+                              description: "",
+                            });
+                          }}
                           placeholder="Моето първо ниво!"
                           type="text"
                           value={newLevel.name}
@@ -420,7 +473,14 @@ export default function Page() {
                               >
                                 <SelectTrigger
                                   className="text-xl"
-                                  onBlur={() => saveDraftLevelToFirestore()}
+                                  onBlur={() => {
+                                    saveDraftLevelToFirestore();
+
+                                    toast({
+                                      title: "Нивото е запазено!",
+                                      description: "",
+                                    });
+                                  }}
                                 >
                                   <SelectValue placeholder="Избери трудност" />
                                 </SelectTrigger>
@@ -475,7 +535,14 @@ export default function Page() {
                     <TabsContent value="description">
                       <p className=" text-2xl mb-2">Описание:</p>
                       <ReactQuill
-                        onBlur={() => saveDraftLevelToFirestore()}
+                        onBlur={() => {
+                          saveDraftLevelToFirestore();
+
+                          toast({
+                            title: "Нивото е запазено!",
+                            description: "",
+                          });
+                        }}
                         theme="snow"
                         modules={{ toolbar: toolbarOptions }}
                         value={newLevel.description}
@@ -663,7 +730,14 @@ export default function Page() {
                     <div>
                       <p className=" text-2xl mb-2">Име:</p>
                       <Input
-                        onBlur={() => saveDraftLevelToFirestore()}
+                        onBlur={() => {
+                          saveDraftLevelToFirestore();
+
+                          toast({
+                            title: "Нивото е запазено!",
+                            description: "",
+                          });
+                        }}
                         placeholder="Моето първо ниво!"
                         type="text"
                         value={newLevel.name}
@@ -701,7 +775,14 @@ export default function Page() {
                             >
                               <SelectTrigger
                                 className="text-xl"
-                                onBlur={() => saveDraftLevelToFirestore()}
+                                onBlur={() => {
+                                  saveDraftLevelToFirestore();
+
+                                  toast({
+                                    title: "Нивото е запазено!",
+                                    description: "",
+                                  });
+                                }}
                               >
                                 <SelectValue placeholder="Избери трудност" />
                               </SelectTrigger>
@@ -754,7 +835,14 @@ export default function Page() {
                   <TabsContent value="description">
                     <p className=" text-2xl mb-2">Описание:</p>
                     <ReactQuill
-                      onBlur={() => saveDraftLevelToFirestore()}
+                      onBlur={() => {
+                        saveDraftLevelToFirestore();
+
+                        toast({
+                          title: "Нивото е запазено!",
+                          description: "",
+                        });
+                      }}
                       theme="snow"
                       modules={{ toolbar: toolbarOptions }}
                       value={newLevel.description}
