@@ -16,23 +16,30 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { User } from "@/interfaces";
-import { useRouter } from "next/navigation";
-import { Timestamp, collection, getDocs } from "firebase/firestore";
+import {
+  Timestamp,
+  collection,
+  doc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "@/firebase/firebase";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function UserList() {
-  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
+  const [currentUsers, setCurrentUsers] = useState<User[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [mount, setMount] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 5;
-
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   useEffect(() => {
-    const FetchUsers = async () => {
+    const fetchUsers = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "users"));
         const newUsers: User[] = [];
@@ -42,36 +49,54 @@ export default function UserList() {
           } as User);
         });
         setUsers(newUsers);
+        setMount(true);
       } catch (error) {
         console.error("Error fetching Users:", error);
       }
     };
-    setMount(true);
-    FetchUsers();
+    fetchUsers();
   }, []);
 
-  const handleDeleteuser = (userId: string) => {
-    alert(`Banning user ${userId}`);
+  useEffect(() => {
+    if (mount) {
+      const filteredUsers = users.filter((user) => {
+        return (
+          user.uid.includes(searchTerm) ||
+          user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (user.dateOfRegistration instanceof Timestamp &&
+            user.dateOfRegistration
+              .toDate()
+              .toLocaleDateString()
+              .includes(searchTerm))
+        );
+      });
+      setCurrentUsers(filteredUsers.slice(indexOfFirstItem, indexOfLastItem));
+    }
+  }, [currentPage, searchTerm, users, mount]);
+
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+
+  const handleDeleteuser = async (userId: string) => {
+    try {
+      const userIndex = currentUsers.findIndex((user) => user.uid === userId);
+      if (userIndex !== -1) {
+        const newBanStatus = !currentUsers[userIndex].isBanned;
+
+        const userRef = doc(db, "users", userId);
+        await updateDoc(userRef, {
+          isBanned: newBanStatus,
+        });
+
+        setCurrentUsers((prevUsers) => {
+          const updatedUsers = [...prevUsers];
+          updatedUsers[userIndex].isBanned = newBanStatus;
+          return updatedUsers;
+        });
+      }
+    } catch (error) {
+      console.error("Error banning user:", error);
+    }
   };
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
-  const filteredUsers = users.filter((user) => {
-    return (
-      user.uid.includes(searchTerm) ||
-      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (user.dateOfRegistration instanceof Timestamp &&
-        user.dateOfRegistration
-          .toDate()
-          .toLocaleDateString()
-          .includes(searchTerm))
-    );
-  });
-
-  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
-
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
   return (
     <>
@@ -109,7 +134,13 @@ export default function UserList() {
                 <TableRow key={user.uid}>
                   <TableCell>{user.uid}</TableCell>
                   <TableCell>
-                    <img src={user.pfp} className="w-32" alt="" />
+                    <Image
+                      src={user.pfp}
+                      width={100}
+                      height={100}
+                      className="w-32"
+                      alt=""
+                    />
                   </TableCell>
                   <TableCell>{user.username}</TableCell>
                   <TableCell>
@@ -122,7 +153,7 @@ export default function UserList() {
                       <Button>Visit user</Button>
                     </Link>
                     <Button onClick={() => handleDeleteuser(user.uid)}>
-                      Ban User
+                      {user.isBanned ? "Unban User" : "Ban User"}
                     </Button>
                   </TableCell>
                 </TableRow>
