@@ -22,7 +22,6 @@ export default function UnityLevelEmbed({
   const [loadingPercentage, setLoadingPercentage] = useState<number>(0);
   const [hideUI, setHideUI] = useState(false);
 
-  const [gameStatus, setGameStatus] = useState("");
   const {
     unityProvider,
     sendMessage,
@@ -37,9 +36,6 @@ export default function UnityLevelEmbed({
     dataUrl: "build/level-creator/unity.data",
     frameworkUrl: "build/level-creator/unity.framework.js",
     codeUrl: "build/level-creator/unity.wasm",
-    webglContextAttributes: {
-      preserveDrawingBuffer: true,
-    },
   });
 
   useEffect(() => {
@@ -84,7 +80,6 @@ export default function UnityLevelEmbed({
   }, [isLoaded, loadingProgression]);
 
   const FetchData = useCallback((data: any) => {
-    setGameStatus(data);
     onFetchSeed(data);
   }, []);
 
