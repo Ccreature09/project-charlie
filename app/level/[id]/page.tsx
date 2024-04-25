@@ -27,6 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import CommentSection from "@/components/functional/comment-section";
 
 export default function Page({ params }: { params: { id: string } }) {
   const [slug, setSlug] = useState(params.id);
@@ -290,12 +291,234 @@ export default function Page({ params }: { params: { id: string } }) {
         <div className="flex flex-col mt-5 lg:flex-row">
           {isSmallScreen ? (
             <>
-              <div className="mx-5 mb-5">
-                <div className="w-full h-full flex flex-col p-5  bg-white rounded-lg">
+              <div>
+                <div className="mx-5 mb-5">
+                  <div className="w-full h-full flex flex-col p-5  bg-white rounded-lg">
+                    <p className="text-4xl font-bold text-center mt-5 ">
+                      {level?.name}
+                    </p>
+
+                    <p className="text-2xl font-semibold text-center">
+                      <span className="text-gray-700">От </span>
+                      <HoverCard>
+                        <HoverCardTrigger asChild>
+                          <Link href={`/profile/${level?.authorUID}`}>
+                            <Button className="text-3xl" variant="link">
+                              @{level?.author}
+                            </Button>
+                          </Link>
+                        </HoverCardTrigger>
+                        <HoverCardContent className="">
+                          <div className="flex">
+                            <Avatar className="flex mx-5">
+                              <AvatarImage src={author?.pfp || ""} />
+                              <AvatarFallback>{level?.author}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <h4 className="text-md font-semibold">
+                                @{level?.author}
+                              </h4>
+
+                              <div className="flex items-center ">
+                                <span className="text-xs text-muted-foreground">
+                                  Joined{" "}
+                                  {author?.dateOfRegistration instanceof
+                                  Timestamp
+                                    ? author.dateOfRegistration
+                                        .toDate()
+                                        .toLocaleDateString()
+                                    : ""}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
+                    </p>
+                    <div className="mx-10 my-3 flex">
+                      {(level &&
+                        userData &&
+                        userData?.completedLevels.includes(level?.id)) ||
+                      gameStatus == "Victory" ? (
+                        <Badge className="text-center mx-auto px-10 hover:bg-green-700 bg-green-500">
+                          Завършено
+                        </Badge>
+                      ) : (
+                        <Badge className="text-center mx-auto px-10 hover:bg-red-700 bg-red-500">
+                          Незавършено
+                        </Badge>
+                      )}
+                    </div>
+                    {packName && (
+                      <div className="bg-blue-300 w-1/2 mx-auto rounded-3xl shadow-xl p-2">
+                        <p className="text-center text-white font-bold ">
+                          - {packName} -
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="p-5 font-medium ">
+                      <ReactQuill
+                        readOnly
+                        value={level?.description}
+                        theme={"snow"}
+                        className=" max-h-[775px] overflow-y-auto"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mx-5 mb-5">
+                  <div className="w-full lg:w-[67%]  flex flex-col mr-10">
+                    <div>
+                      {level && (
+                        <UnityLevelEmbed
+                          level={level}
+                          onGameStatusChange={(status) => {
+                            setGameStatus(status);
+                          }}
+                          onFullscreen={requestFullscreen}
+                        />
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap h-[10%] w-full  justify-center md:justify-between md:mr-5 bg-white bg-opacity-15 p-5 gap-4">
+                      {packName && previousLevelId != null && (
+                        <Link
+                          href={`/${
+                            previousLevelId == -1 ? "level-packs" : "level"
+                          }/${
+                            previousLevelId == -1 ? packName : previousLevelId
+                          }`}
+                        >
+                          <Button>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="mr-3"
+                            >
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <polyline points="12 8 8 12 12 16"></polyline>
+                              <line x1="16" y1="12" x2="8" y2="12"></line>
+                            </svg>
+                            Предишно ниво
+                          </Button>
+                        </Link>
+                      )}
+
+                      <Button
+                        disabled={!userData}
+                        className={`${
+                          isLiked
+                            ? "hover:bg-red-500 bg-green-500 "
+                            : "hover:bg-green-500 "
+                        } `}
+                        onClick={() => {
+                          handleLikeClick();
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="flex mr-3"
+                        >
+                          <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                        </svg>
+                        <span
+                          className={`flex my-auto mx-3${
+                            isLiked ? "block" : "hidden"
+                          }`}
+                        >
+                          {isLiked
+                            ? "Харесвано"
+                            : `${
+                                userData
+                                  ? "Харесвай"
+                                  : "Регистрирай се за да харесаш нивото!"
+                              }`}
+                          {userData && ` (${likes})`}
+                        </span>
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setRequestFullscreen((prevState) => !prevState);
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="mr-3"
+                        >
+                          <polyline points="15 3 21 3 21 9"></polyline>
+                          <polyline points="9 21 3 21 3 15"></polyline>
+                          <line x1="21" y1="3" x2="14" y2="10"></line>
+                          <line x1="3" y1="21" x2="10" y2="14"></line>
+                        </svg>
+                        Цял екран
+                      </Button>
+                      {packName && nextLevelId != null && (
+                        <Link
+                          href={`/${
+                            nextLevelId == -1 ? "level-packs" : "level"
+                          }/${nextLevelId == -1 ? packName : nextLevelId}`}
+                        >
+                          <Button>
+                            Следващо ниво
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="ml-3"
+                            >
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <polyline points="12 16 16 12 12 8"></polyline>
+                              <line x1="8" y1="12" x2="16" y2="12"></line>
+                            </svg>
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <p></p>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col w-full">
+              <div className="flex w-full">
+                <div className="w-1/4 h-[89vh] mx-5 bg-white rounded-lg">
                   <p className="text-4xl font-bold text-center mt-5 ">
                     {level?.name}
                   </p>
-
                   <p className="text-2xl font-semibold text-center">
                     <span className="text-gray-700">От </span>
                     <HoverCard>
@@ -332,17 +555,18 @@ export default function Page({ params }: { params: { id: string } }) {
                       </HoverCardContent>
                     </HoverCard>
                   </p>
+
                   <div className="mx-10 my-3 flex">
                     {(level &&
                       userData &&
                       userData?.completedLevels.includes(level?.id)) ||
                     gameStatus == "Victory" ? (
                       <Badge className="text-center mx-auto px-10 hover:bg-green-700 bg-green-500">
-                        Completed
+                        Завършено
                       </Badge>
                     ) : (
                       <Badge className="text-center mx-auto px-10 hover:bg-red-700 bg-red-500">
-                        Incomplete
+                        Незавършено
                       </Badge>
                     )}
                   </div>
@@ -363,10 +587,7 @@ export default function Page({ params }: { params: { id: string } }) {
                     />
                   </div>
                 </div>
-              </div>
-
-              <div className="mx-5 mb-5">
-                <div className="w-full lg:w-[67%]  flex flex-col mr-10">
+                <div className="w-full lg:w-[67%] max-h-[89vh] flex flex-col mr-10">
                   <div>
                     {level && (
                       <UnityLevelEmbed
@@ -504,217 +725,10 @@ export default function Page({ params }: { params: { id: string } }) {
                   </div>
                 </div>
               </div>
-            </>
-          ) : (
-            <>
-              <div className="w-1/4 h-[89vh] mx-5 bg-white rounded-lg">
-                <p className="text-4xl font-bold text-center mt-5 ">
-                  {level?.name}
-                </p>
-                <p className="text-2xl font-semibold text-center">
-                  <span className="text-gray-700">От </span>
-                  <HoverCard>
-                    <HoverCardTrigger asChild>
-                      <Link href={`/profile/${level?.authorUID}`}>
-                        <Button className="text-3xl" variant="link">
-                          @{level?.author}
-                        </Button>
-                      </Link>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="">
-                      <div className="flex">
-                        <Avatar className="flex mx-5">
-                          <AvatarImage src={author?.pfp || ""} />
-                          <AvatarFallback>{level?.author}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h4 className="text-md font-semibold">
-                            @{level?.author}
-                          </h4>
-
-                          <div className="flex items-center ">
-                            <span className="text-xs text-muted-foreground">
-                              Joined{" "}
-                              {author?.dateOfRegistration instanceof Timestamp
-                                ? author.dateOfRegistration
-                                    .toDate()
-                                    .toLocaleDateString()
-                                : ""}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </HoverCardContent>
-                  </HoverCard>
-                </p>
-
-                <div className="mx-10 my-3 flex">
-                  {(level &&
-                    userData &&
-                    userData?.completedLevels.includes(level?.id)) ||
-                  gameStatus == "Victory" ? (
-                    <Badge className="text-center mx-auto px-10 hover:bg-green-700 bg-green-500">
-                      Completed
-                    </Badge>
-                  ) : (
-                    <Badge className="text-center mx-auto px-10 hover:bg-red-700 bg-red-500">
-                      Incomplete
-                    </Badge>
-                  )}
-                </div>
-                {packName && (
-                  <div className="bg-blue-300 w-1/2 mx-auto rounded-3xl shadow-xl p-2">
-                    <p className="text-center text-white font-bold ">
-                      - {packName} -
-                    </p>
-                  </div>
-                )}
-
-                <div className="p-5 font-medium ">
-                  <ReactQuill
-                    readOnly
-                    value={level?.description}
-                    theme={"snow"}
-                    className=" max-h-[775px] overflow-y-auto"
-                  />
-                </div>
+              <div className="flex flex-col">
+                {/*    <CommentSection></CommentSection> */}
               </div>
-              <div className="w-full lg:w-[67%] max-h-[89vh] flex flex-col mr-10">
-                <div>
-                  {level && (
-                    <UnityLevelEmbed
-                      level={level}
-                      onGameStatusChange={(status) => {
-                        setGameStatus(status);
-                      }}
-                      onFullscreen={requestFullscreen}
-                    />
-                  )}
-                </div>
-
-                <div className="flex flex-wrap h-[10%] w-full  justify-center md:justify-between md:mr-5 bg-white bg-opacity-15 p-5 gap-4">
-                  {packName && previousLevelId != null && (
-                    <Link
-                      href={`/${
-                        previousLevelId == -1 ? "level-packs" : "level"
-                      }/${previousLevelId == -1 ? packName : previousLevelId}`}
-                    >
-                      <Button>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="mr-3"
-                        >
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <polyline points="12 8 8 12 12 16"></polyline>
-                          <line x1="16" y1="12" x2="8" y2="12"></line>
-                        </svg>
-                        Предишно ниво
-                      </Button>
-                    </Link>
-                  )}
-
-                  <Button
-                    disabled={!userData}
-                    className={`${
-                      isLiked
-                        ? "hover:bg-red-500 bg-green-500 "
-                        : "hover:bg-green-500 "
-                    } `}
-                    onClick={() => {
-                      handleLikeClick();
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="flex mr-3"
-                    >
-                      <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-                    </svg>
-                    <span
-                      className={`flex my-auto mx-3${
-                        isLiked ? "block" : "hidden"
-                      }`}
-                    >
-                      {isLiked
-                        ? "Харесвано"
-                        : `${
-                            userData
-                              ? "Харесвай"
-                              : "Регистрирай се за да харесаш нивото!"
-                          }`}
-                      {userData && ` (${likes})`}
-                    </span>
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setRequestFullscreen((prevState) => !prevState);
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-3"
-                    >
-                      <polyline points="15 3 21 3 21 9"></polyline>
-                      <polyline points="9 21 3 21 3 15"></polyline>
-                      <line x1="21" y1="3" x2="14" y2="10"></line>
-                      <line x1="3" y1="21" x2="10" y2="14"></line>
-                    </svg>
-                    Цял екран
-                  </Button>
-                  {packName && nextLevelId != null && (
-                    <Link
-                      href={`/${nextLevelId == -1 ? "level-packs" : "level"}/${
-                        nextLevelId == -1 ? packName : nextLevelId
-                      }`}
-                    >
-                      <Button>
-                        Следващо ниво
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="ml-3"
-                        >
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <polyline points="12 16 16 12 12 8"></polyline>
-                          <line x1="8" y1="12" x2="16" y2="12"></line>
-                        </svg>
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </>
+            </div>
           )}
         </div>
       </div>
