@@ -67,6 +67,7 @@ export const handleGoogleSignIn = async () => {
         levels: [],
         likedLevels: [],
         completedLevels: [],
+        isBanned: false,
       };
 
       await setDoc(userDocRef, userData);
@@ -116,6 +117,7 @@ export default function UserForm({ login, mobile }: UserFormProps) {
           levels: [],
           likedLevels: [],
           completedLevels: [],
+          isBanned: false,
         };
 
         await setDoc(userDocRef, userData);
@@ -163,6 +165,7 @@ export default function UserForm({ login, mobile }: UserFormProps) {
           levels: [],
           likedLevels: [],
           completedLevels: [],
+          isBanned: false,
         };
 
         await setDoc(userDocRef, userData);
