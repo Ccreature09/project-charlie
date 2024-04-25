@@ -36,6 +36,9 @@ export default function UnityLevelEmbed({
     dataUrl: "build/level-creator/unity.data",
     frameworkUrl: "build/level-creator/unity.framework.js",
     codeUrl: "build/level-creator/unity.wasm",
+    webglContextAttributes: {
+      preserveDrawingBuffer: true,
+    },
   });
 
   useEffect(() => {
