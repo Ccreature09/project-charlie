@@ -27,7 +27,6 @@ import { Badge } from "@/components/ui/badge";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import CommentSection from "@/components/functional/comment-section";
 
 export default function Page({ params }: { params: { id: string } }) {
   const [slug, setSlug] = useState(params.id);
