@@ -298,43 +298,43 @@ export default function Page({ params }: { params: { id: string } }) {
                       {level?.name}
                     </p>
 
-                    <p className="text-2xl font-semibold text-center">
-                      <span className="text-gray-700">От </span>
-                      <HoverCard>
-                        <HoverCardTrigger asChild>
-                          <Link href={`/profile/${level?.authorUID}`}>
-                            <Button className="text-3xl" variant="link">
+                    <span className="text-gray-700 text-center mt-5">От </span>
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Link href={`/profile/${level?.authorUID}`}>
+                          <Button
+                            className="text-3xl mx-auto flex text-center whitespace-normal my-2"
+                            variant="link"
+                          >
+                            @{level?.author}
+                          </Button>
+                        </Link>
+                      </HoverCardTrigger>
+                      <HoverCardContent className="">
+                        <div className="flex">
+                          <Avatar className="flex mx-5">
+                            <AvatarImage src={author?.pfp || ""} />
+                            <AvatarFallback>{level?.author}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h4 className="text-md font-semibold">
                               @{level?.author}
-                            </Button>
-                          </Link>
-                        </HoverCardTrigger>
-                        <HoverCardContent className="">
-                          <div className="flex">
-                            <Avatar className="flex mx-5">
-                              <AvatarImage src={author?.pfp || ""} />
-                              <AvatarFallback>{level?.author}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <h4 className="text-md font-semibold">
-                                @{level?.author}
-                              </h4>
+                            </h4>
 
-                              <div className="flex items-center ">
-                                <span className="text-xs text-muted-foreground">
-                                  Joined{" "}
-                                  {author?.dateOfRegistration instanceof
-                                  Timestamp
-                                    ? author.dateOfRegistration
-                                        .toDate()
-                                        .toLocaleDateString()
-                                    : ""}
-                                </span>
-                              </div>
+                            <div className="flex items-center ">
+                              <span className="text-xs text-muted-foreground">
+                                Joined{" "}
+                                {author?.dateOfRegistration instanceof Timestamp
+                                  ? author.dateOfRegistration
+                                      .toDate()
+                                      .toLocaleDateString()
+                                  : ""}
+                              </span>
                             </div>
                           </div>
-                        </HoverCardContent>
-                      </HoverCard>
-                    </p>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                     <div className="mx-10 my-3 flex">
                       {(level &&
                         userData &&
@@ -515,46 +515,49 @@ export default function Page({ params }: { params: { id: string } }) {
           ) : (
             <div className="flex flex-col w-full">
               <div className="flex w-full">
-                <div className="w-1/4 h-[89vh] mx-5 bg-white rounded-lg">
+                <div className="w-1/4 h-[89vh] flex flex-col mx-5 bg-white rounded-lg">
                   <p className="text-4xl font-bold text-center mt-5 ">
                     {level?.name}
                   </p>
-                  <p className="text-2xl font-semibold text-center">
-                    <span className="text-gray-700">От </span>
-                    <HoverCard>
-                      <HoverCardTrigger asChild>
-                        <Link href={`/profile/${level?.authorUID}`}>
-                          <Button className="text-3xl" variant="link">
+                  <span className="text-gray-700 flex mx-auto text-center mt-5">
+                    От
+                  </span>
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <Link href={`/profile/${level?.authorUID}`}>
+                        <Button
+                          className="text-3xl flex mx-auto text-center whitespace-normal"
+                          variant="link"
+                        >
+                          @{level?.author}
+                        </Button>
+                      </Link>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="">
+                      <div className="flex">
+                        <Avatar className="flex mx-5">
+                          <AvatarImage src={author?.pfp || ""} />
+                          <AvatarFallback>{level?.author}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h4 className="text-md font-semibold">
                             @{level?.author}
-                          </Button>
-                        </Link>
-                      </HoverCardTrigger>
-                      <HoverCardContent className="">
-                        <div className="flex">
-                          <Avatar className="flex mx-5">
-                            <AvatarImage src={author?.pfp || ""} />
-                            <AvatarFallback>{level?.author}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <h4 className="text-md font-semibold">
-                              @{level?.author}
-                            </h4>
+                          </h4>
 
-                            <div className="flex items-center ">
-                              <span className="text-xs text-muted-foreground">
-                                Joined{" "}
-                                {author?.dateOfRegistration instanceof Timestamp
-                                  ? author.dateOfRegistration
-                                      .toDate()
-                                      .toLocaleDateString()
-                                  : ""}
-                              </span>
-                            </div>
+                          <div className="flex items-center ">
+                            <span className="text-xs text-muted-foreground">
+                              Joined{" "}
+                              {author?.dateOfRegistration instanceof Timestamp
+                                ? author.dateOfRegistration
+                                    .toDate()
+                                    .toLocaleDateString()
+                                : ""}
+                            </span>
                           </div>
                         </div>
-                      </HoverCardContent>
-                    </HoverCard>
-                  </p>
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
 
                   <div className="mx-10 my-3 flex">
                     {(level &&
