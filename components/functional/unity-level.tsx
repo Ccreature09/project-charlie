@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import { Level } from "@/interfaces";
 import { Progress } from "../ui/progress";
-
 export default function UnityLevelEmbed({
   level,
   onGameStatusChange,
@@ -15,6 +14,7 @@ export default function UnityLevelEmbed({
   const [loadingPercentage, setLoadingPercentage] = useState(0);
   const {
     unityProvider,
+    unload,
     sendMessage,
     isLoaded,
     loadingProgression,
@@ -27,6 +27,20 @@ export default function UnityLevelEmbed({
     frameworkUrl: "/build/level/unity.framework.js",
     codeUrl: "/build/level/unity.wasm",
   });
+
+  useEffect(() => {
+    const handleBeforeUnload = async (event: BeforeUnloadEvent) => {
+      console.log("Unloading Unity before page unload...");
+      await unload();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      unload();
+    };
+  }, [unload]);
 
   useEffect(() => {
     requestFullscreen(true);
