@@ -28,4 +28,5 @@ export interface User {
   completedLevels: number[];
   likedLevels: number[];
   dateOfRegistration: Timestamp | FieldValue;
+  isBanned: boolean;
 }
