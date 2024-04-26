@@ -189,6 +189,9 @@ export default function Page() {
     if (seed) {
       const [finalSeed, draftSeed] = seed.split("~");
       setFinalSeed(finalSeed);
+      console.log("final seed: " + finalSeed)
+      console.log("draft seed: " + draftSeed)
+
       setNewLevel((prevNewLevel) => ({
         ...prevNewLevel,
         seed: draftSeed,
@@ -214,10 +217,13 @@ export default function Page() {
         newLevel.difficulty
       ) {
         setNewLevel({ ...newLevel, seed: finalSeed });
+        console.log("submitting final seed: " + finalSeed)
+        console.log("submitting final seed (new level.seed): " + newLevel.seed)
+
         const newLevelData = {
           ...newLevel,
           lowercaseName: newLevel.name.toLowerCase(),
-          seed: newLevel.seed,
+          seed: finalSeed,
           grid: `${width}x${height}`,
           id: levelCount,
           publishDate: serverTimestamp(),

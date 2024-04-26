@@ -25,6 +25,7 @@ export default function UnityLevelEmbed({
   const {
     unityProvider,
     sendMessage,
+    unload,
     isLoaded,
     loadingProgression,
     requestFullscreen,
@@ -40,6 +41,20 @@ export default function UnityLevelEmbed({
       preserveDrawingBuffer: true,
     },
   });
+
+  useEffect(() => {
+    const handleBeforeUnload = async (event: BeforeUnloadEvent) => {
+      console.log("Unloading Unity before page unload...");
+      await unload();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      unload();
+    };
+  }, [unload]);
 
   useEffect(() => {
     requestFullscreen(true);
