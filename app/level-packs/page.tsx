@@ -9,15 +9,15 @@ const cardData = [
     imageSrc: "https://cdn-icons-png.flaticon.com/512/2232/2232688.png",
   },
   {
-    title: "Базовите неща",
-    imageSrc: "",
+    title: "Отново и отново...",
+    imageSrc: "https://ioflood.com/blog/wp-content/uploads/2023/10/Artistic-representation-of-Java-recursion-code-blocks.jpg",
   },
   {
-    title: "За начинаещите",
-    imageSrc: "",
+    title: "Работа в екип!",
+    imageSrc: "https://i.ibb.co/5T4h081/image.png",
   },
   {
-    title: "За Напреднали",
+    title: "Бонус нива",
     imageSrc: "",
   },
   {
