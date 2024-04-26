@@ -262,8 +262,11 @@ export default function Page() {
       if (user) {
         setUser(user);
         setsignInPopup(false);
+        console.log("Please sign in")
         setBanPopup(await checkUserBannedStatus(user.uid));
       } else {
+        console.log("Signed in")
+
         setUser(null);
         setsignInPopup(true);
       }

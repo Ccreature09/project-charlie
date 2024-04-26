@@ -27,7 +27,7 @@ export default function Page() {
 
   return (
     <>
-      <div className="h-screen bg-cover min-h-screen 2xl:min-h-[130vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] ">
+      <div className="h-screen bg-cover min-h-screen 2xl:min-h-[190vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] ">
         <Navbar />
         <div className="container  p-4 flex flex-col">
           <Tabs defaultValue="levels" className="w-full mx-auto">
