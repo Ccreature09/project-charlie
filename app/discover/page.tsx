@@ -75,7 +75,7 @@ export default function Page() {
 
   return (
     <>
-      <div className="h-screen bg-cover min-h-[200vh] 2xl:min-h-[150vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] ">
+      <div className="h-screen bg-cover min-h-[200vh] 2xl:min-h-[190vh] bg-[url('https://i.ibb.co/k2Lnz9t/blurry-gradient-haikei-1.png')] ">
         <Navbar></Navbar>
 
         <p className="text-5xl text-white mt-10 font-bold text-center select-none pointer-events-none">
